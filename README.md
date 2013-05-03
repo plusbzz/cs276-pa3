@@ -1,3 +1,7 @@
+cs276-pa3
+=========
+
+CS276: Programming Assignment 3
 This folder contains the following files:
 
 1. Data
