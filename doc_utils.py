@@ -6,11 +6,13 @@ from math import log
 class Document(object):
     '''Container class for utility static methods'''
     @staticmethod
-    def compute_tf_vector(words):
+    def compute_tf_vector(words,multiplier = 1):
         tf = {}
         for w in words:
-            if w not in tf: tf[w] = 0
+            if w not in tf: tf[w] = 0.0
             tf[w] += 1
+        if multiplier > 1:
+            for w in tf: tf[w] *= multiplier
         return tf
     
     @staticmethod
@@ -70,7 +72,10 @@ class Anchor(object):
     '''Properties of a single anchor text chunk'''
     def __init__(self,anchor_text,anchor_count):
         self.text = anchor_text
+        self.terms = self.text.strip().split()
         self.count = anchor_count
+        self.term_counts = Document.compute_tf_vector(self.terms,self.count)
+            
      
 class Page(object):
     '''Represents a single web page, with all its fields. Contains TF vectors for the fields'''
@@ -85,7 +90,7 @@ class Page(object):
  
         self.field_tf_vectors = self.compute_field_tf_vectors()
 
-    def url_tf_vector(self): # parse/split URL
+    def url_tf_vector(self): # TODO parse/split URL
         pass
 
     def header_tf_vector(self):
@@ -94,19 +99,24 @@ class Page(object):
 
     def body_tf_vector(self):
         tf = {}
-        l = float(self.body_length)
-        
+        l = float(self.body_length)       
         for bh in self.body_hits:
-            tf[bh] = len(self.body_hits[bh])/l
-        
+            tf[bh] = len(self.body_hits[bh])/l       
         return tf
 
-    def title_tf_vector(self): # should be same/similar to header method
-        words = self.title.strip().split()
+    def title_tf_vector(self): 
+        words = self.title.strip().split() # Can do stemming etc here
         return Document.compute_tf_norm_vector(words,self.body_length)
 
     def anchor_tf_vector(self):
-        pass
+        tf = {}
+        for a in self.anchors:
+            atf = a.term_counts
+            for term in atf:
+                if term not in tf: tf[term] = 0.0
+                tf[term] += atf[term]
+        for term in tf: tf[term] /= self.body_length # normalize
+        return tf
 
     def compute_field_tf_vectors(self):
         tfs = {}
