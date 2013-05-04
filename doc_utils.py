@@ -22,10 +22,11 @@ class Document(object):
         return tf
     
     @staticmethod
-    def compute_tf_idf_vector(words,corpus):
+    def compute_tf_idf_vector(words,corpus = None):
         tf = Document.compute_tf_vector(words)
-        for w in tf:
-            tf[w] *= corpus.get_IDF(w)
+        if corpus is not None:
+            for w in tf:
+                tf[w] *= corpus.get_IDF(w)
         return tf
     
     @staticmethod
@@ -88,21 +89,21 @@ class Page(object):
         pass
 
     def header_tf_vector(self):
-        words = self.header.strip().split()
-        return Document.compute_tf_norm_vector(words)
+        words = reduce(lambda x,h: x+h.strip().split(),self.header,[])
+        return Document.compute_tf_norm_vector(words,self.body_length)
 
     def body_tf_vector(self):
         tf = {}
         l = float(self.body_length)
         
-        for bh in body_hits:
-            tf[bh] = len(body_hits[bh])/l
+        for bh in self.body_hits:
+            tf[bh] = len(self.body_hits[bh])/l
         
         return tf
 
     def title_tf_vector(self): # should be same/similar to header method
         words = self.title.strip().split()
-        return Document.compute_tf_norm_vector(words)
+        return Document.compute_tf_norm_vector(words,self.body_length)
 
     def anchor_tf_vector(self):
         pass
@@ -119,7 +120,7 @@ class Page(object):
 # Look in rank0.main() for how this object is created. Also look at the pa3_play ipython notebook.
 class Query(object):
     '''A single query, with all the results associated with it'''
-    def __init__(self,query,query_pages,corpus):  # query_pages : query -> urls
+    def __init__(self,query,query_pages,corpus=None):  # query_pages : query -> urls
         self.query = query
         self.terms = self.query.strip().split()
         self.pages = dict([(p,Page(p,v)) for p,v in query_pages.iteritems()]) # URLs
