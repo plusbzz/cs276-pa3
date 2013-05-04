@@ -1,0 +1,276 @@
+query: stanford live
+  url: http://live.stanford.edu/aboutus/staff.php
+    title: stanford live & bing concert hall staff
+    header: stanford live & bing concert hall staff
+    body_hits: stanford 1 21 25 33 90 130 209 216 223 233 241 248 254 259
+    body_hits: live 2 34 91 131 210
+    body_length: 264
+    pagerank: 6
+  url: http://live.stanford.edu/month_list.php?filter=main
+    title: stanford live upcoming events full calendar
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with jon nakamatsu piano
+    header: the beethoven project stanford philharmonia orchestra jindong cai music director and conductor with jon nakamatsu piano
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with stanford symphonic chorus
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with stanford symphonic chorus
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor
+    header: the beethoven project stanford philharmonia orchestra jindong cai music director and conductor jon nakamatsu piano
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor jon nakamatsu piano
+    header: the beethoven project stanford philharmonia orchestra stephen m sano conductor with stanford symphonic chorus
+    header: choir of new college oxford edward higginbottom director with guests stanford chamber chorale stephen m sano director
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with jon nakamatsu piano
+    body_hits: stanford 1 21 25 33 104 106 110 113 136 146 213 235 305 354 511 523 723 834 932 1125 1208 1257 1264 1271 1281 1289 1296 1302 1307
+    body_hits: live 2 34 105 111 599 1258
+    body_length: 1312
+    pagerank: 6
+    anchor_text: http live stanford edu month_list php filter main
+      stanford_anchor_count: 4
+  url: http://live.stanford.edu/aboutus/contactus.php
+    title: contact stanford live
+    header: contact stanford live
+    header: stanford ticket office
+    header: stanford live administrative office
+    body_hits: stanford 1 21 25 33 90 135 142 146 154 156 161 191 194 204 414 464 471 478 488 496 503 509 514
+    body_hits: live 2 34 91 143 195 465
+    body_length: 519
+    pagerank: 6
+  url: http://live.stanford.edu/aboutus/faqs.php
+    title: stanford live faq
+    header: stanford live faqs
+    header: what is stanford live
+    header: how can i get updates about stanford live
+    body_hits: stanford 1 21 25 33 108 116 120 221 226 234 257 260 265 294 304 311 321 336 368 388 421 502 758 786 793 800 810 818 825 831 836
+    body_hits: live 2 34 109 117 235 261 295 322 369 422 787
+    body_length: 841
+    pagerank: 6
+    anchor_text: stanford live faqs
+      stanford_anchor_count: 212
+  url: http://live.stanford.edu/Venues/boxinfo.php
+    title: how to buy tickets
+    header: stanford students all tickets just $10
+    header: stanford faculty staff
+    header: non stanford students save $5 off adult ticket prices
+    body_hits: stanford 1 21 25 33 122 126 134 136 174 206 468 482 510 543 562 576 707 765 782 888 935 970 973 991 1010 1017 1024 1034 1042 1049 1055 1060
+    body_hits: live 2 34 123 175 207 483 708 992 1011
+    body_length: 1065
+    pagerank: 6
+    anchor_text: http live stanford edu venues boxinfo php discounts
+      stanford_anchor_count: 1
+    anchor_text: stanford live
+      stanford_anchor_count: 2
+    anchor_text: http livelyarts stanford edu venues boxinfo php discounts
+      stanford_anchor_count: 1
+  url: http://binghall.stanford.edu/
+    title: bing concert hall
+    header: stanford student get involved
+    body_hits: stanford 1 21 25 33 116 239 249 260 453 457 473 480 487 497 505 512 518 523
+    body_hits: live 2 34 436 454 474
+    body_length: 528
+    pagerank: 6
+    anchor_text: http live stanford edu bingconcerthall
+      stanford_anchor_count: 1
+    anchor_text: http binghall stanford edu
+      stanford_anchor_count: 2
+    anchor_text: learn more about bing concert hall at http binghall stanford edu
+      stanford_anchor_count: 1
+  url: http://live.stanford.edu/presenter.php?code=LIVE
+    title: stanford lively arts view by presenter
+    header: stanford live
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with jon nakamatsu piano
+    header: the beethoven project stanford philharmonia orchestra jindong cai music director and conductor with jon nakamatsu piano
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with stanford symphonic chorus
+    body_hits: stanford 1 21 25 33 104 106 110 113 136 220 359 366 373 383 391 398 404 409
+    body_hits: live 2 34 105 111 360
+    body_length: 414
+    pagerank: 5
+    anchor_text: stanford live
+      stanford_anchor_count: 158
+  url: http://live.stanford.edu/aboutus/
+    title: welcome to stanford live
+    header: welcome to stanford live
+    body_hits: stanford 1 21 25 33 90 118 141 163 168 180 185 204 226 253 258 286 297 327 359 378 389 420 427 434 444 452 459 465 470
+    body_hits: live 2 34 91 131 142 169 181 227 254 287 328 360 374 390 421
+    body_length: 475
+    pagerank: 6
+  url: http://live.stanford.edu/month_list.php
+    title: stanford live upcoming events full calendar
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with jon nakamatsu piano
+    header: stanford taiko spring concert
+    header: the beethoven project stanford philharmonia orchestra jindong cai music director and conductor with jon nakamatsu piano
+    header: stanford wind ensemble
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with stanford symphonic chorus
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with stanford symphonic chorus
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor
+    header: the beethoven project stanford philharmonia orchestra jindong cai music director and conductor jon nakamatsu piano
+    header: stanford pan asian music festival masters and masterpieces featuring members of the china national orchestra
+    header: stanford pan asian music festival chinese new year's concert featuring the china national orchestra
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor jon nakamatsu piano
+    header: the beethoven project stanford symphony orchestra jindong cai music director and conductor with jon nakamatso piano
+    header: stanford jazz orchestra frederick berry directs the stanford jazz orchestra with special guest rufus reed bass
+    header: the liebeslieder project stanford chamber chorale with the dance division of theatre & performance studies
+    header: stanford wind ensemble
+    header: the beethoven project stanford philharmonia orchestra stephen m sano conductor with stanford symphonic chorus
+    header: open rehearsal choir of new college oxford edward higginbottom director with guests stanford chamber chorale stephen m sano director
+    header: choir of new college oxford edward higginbottom director with guests stanford chamber chorale stephen m sano director
+    body_hits: stanford 1 21 25 33 104 106 110 113 136 146 214 245 281 350 369 418 450 483 496 600 642 709 721 790 794 806 984 1066 1084 1173 1213 1242 1260 1278 1296 1340 1368 1445 1696 1741 1849 1856 1863 1873 1881 1888 1894 1899
+    body_hits: live 2 34 105 111 791 830 1850
+    body_length: 1904
+    pagerank: 6
+    anchor_text: stanford lively arts 2009 2010 season
+      stanford_anchor_count: 1
+    anchor_text: stanford live
+      stanford_anchor_count: 1
+    anchor_text: stanford lively arts calendar
+      stanford_anchor_count: 12
+    anchor_text: stanford lively arts season
+      stanford_anchor_count: 2
+  url: http://live.stanford.edu/
+    title: stanford live
+    body_hits: stanford 1 21 25 33 125 182 189 196 206 214 221 227 232
+    body_hits: live 2 34 183
+    body_length: 237
+    pagerank: 7
+    anchor_text: stanford live
+      stanford_anchor_count: 209
+    anchor_text: stanford lively arts
+      stanford_anchor_count: 204
+    anchor_text: http live stanford edu
+      stanford_anchor_count: 3
+    anchor_text: lively arts stanford live
+      stanford_anchor_count: 2
+    anchor_text: stanford lively arts schedule
+      stanford_anchor_count: 1
+    anchor_text: http livelyarts stanford edu
+      stanford_anchor_count: 200
+    anchor_text: live stanford edu
+      stanford_anchor_count: 1
+    anchor_text: stanford livelyarts
+      stanford_anchor_count: 5
+    anchor_text: livelyarts stanford edu
+      stanford_anchor_count: 3
+    anchor_text: lively arts at stanford
+      stanford_anchor_count: 10
+    anchor_text: stanford lively arts great performances with student discounts
+      stanford_anchor_count: 1
+    anchor_text: stanford university lively arts
+      stanford_anchor_count: 1
+    anchor_text: stanford live website
+      stanford_anchor_count: 1
+    anchor_text: stanford livey arts
+      stanford_anchor_count: 3
+    anchor_text: ttp livelyarts stanford edu
+      stanford_anchor_count: 1
+    anchor_text: stanford lively art
+      stanford_anchor_count: 1
+    anchor_text: stanford lively arts website
+      stanford_anchor_count: 1
+    anchor_text: stanford events through the ticket office
+      stanford_anchor_count: 3
+    anchor_text: stanford lively arts program
+      stanford_anchor_count: 1
+    anchor_text: stanford lively arts 2010 11 season tickets on sale now
+      stanford_anchor_count: 1
+    anchor_text: stanford lively arts 2010 11 season tickets on sale soon
+      stanford_anchor_count: 1
+    anchor_text: visit the stanford lively arts website
+      stanford_anchor_count: 1
+    anchor_text: terence blanchard quintet and stanford symphony orchestra requiem for katrina march 06 2010 8 00pm memorial
+      stanford_anchor_count: 1
+query: manning
+  url: http://nlp.stanford.edu/~manning/
+    title: christopher manning stanford nlp
+    header: christopher manning
+    body_hits: manning 2 81 245 930 932 933
+    body_length: 1006
+    pagerank: 6
+    anchor_text: christopher manning
+      stanford_anchor_count: 68
+    anchor_text: chris manning
+      stanford_anchor_count: 113
+    anchor_text: christopher d manning
+      stanford_anchor_count: 23
+    anchor_text: prof chris manning
+      stanford_anchor_count: 1
+    anchor_text: manning
+      stanford_anchor_count: 1
+    anchor_text: cd manning
+      stanford_anchor_count: 1
+    anchor_text: http nlp stanford edu manning
+      stanford_anchor_count: 14
+    anchor_text: manning c
+      stanford_anchor_count: 1
+    anchor_text: professor christopher manning
+      stanford_anchor_count: 1
+    anchor_text: prof christopher manning
+      stanford_anchor_count: 2
+    anchor_text: http www nlp stanford edu manning
+      stanford_anchor_count: 1
+    anchor_text: christopher david manning
+      stanford_anchor_count: 1
+    anchor_text: christopher manning profile
+      stanford_anchor_count: 2
+  url: https://stanfordwho.stanford.edu/lookup?search=Chris%20Manning&submit=Search
+    title: public listing from stanford people search
+    header: christopher d manning
+    body_hits: manning 88 99 175 179 181 183
+    body_length: 210
+    pagerank: 3
+  url: http://cyberlaw.stanford.edu/page/manning-faculty-lounge
+    title: manning faculty lounge center for internet and society
+    header: manning faculty lounge
+    body_hits: manning 138
+    body_length: 310
+    pagerank: 4
+    anchor_text: manning faculty lounge law school building
+      stanford_anchor_count: 2
+    anchor_text: manning faculty lounge
+      stanford_anchor_count: 15
+  url: http://nlp.stanford.edu/~manning/papers/
+    title: christopher manning papers and publications
+    header: christopher manning papers and publications
+    body_hits: manning 45 86 109 126 150 165 200 225 236 289 306 354 357 368 396 410 473 516 542 557 592 605 634 652 680 694 755 780 795 820 833 855 868 895 906 942 972 1002 1033 1065 1094 1105 1142 1169 1185 1209 1226 1256 1268 1307 1318 1348 1360 1386 1399 1425 1434 1469 1499 1511 1550 1581 1593 1615 1646 1669 1684 1710 1732 1753 1772 1795 1824 1851 1862 1899 1910 1952 1973 2011 2027 2054 2075 2091 2100 2128 2136 2165 2183 2200 2222 2233 2260 2272 2297 2310 2339 2353 2387 2400 2432 2445 2464 2476 2515 2536 2550 2572 2582 2612 2640 2655 2686 2703 2717 2741 2753 2779 2794 2845 2861 2876 2913 2925 2959 2972 3007 3010 3021 3064 3092 3123 3134 3164 3197 3207 3239 3266 3276 3337 3377 3390 3417 3431 3449 3467 3497 3527 3541 3553 3574 3586 3606 3621 3634 3649 3673 3682 3735 3758 3769 3785 3799 3820 3834 3860 3874 3895 3906 3948 3957 3981 4022 4055 4088 4099 4128 4140 4168 4183 4211 4221 4251 4270 4306 4341 4381 4418 4447 4473 4493 4503 4546 4560 4583 4601 4633 4647 4675 4686 4710 4723 4756 4765 4798 4808 4841 4870 4914 4922 4956 4997 5042 5072 5098 5137 5145 5167 5185 5216 5258 5306 5329 5350 5392 5415 5445 5487 5503 5530 5556 5599 5641 5668 5675 5723 5733 5759 5767 5793 5803 5864 5872 5908 5932 5939 5962 5970 6000 6007 6026 6034 6047 6055 6071 6079 6095 6108 6111 6112
+    body_length: 6118
+    pagerank: 5
+    anchor_text: http nlp stanford edu manning papers
+      stanford_anchor_count: 1
+  url: http://engineering.stanford.edu/node/9067
+    title: christopher manning engineering
+    header: christopher manning
+    body_hits: manning 131 134 208 227 247 271 280
+    body_length: 346
+    pagerank: 3
+    anchor_text: chris manning
+      stanford_anchor_count: 3
+    anchor_text: christopher manning
+      stanford_anchor_count: 200
+  url: http://nlp.stanford.edu/jrfinkel/
+    title: jenny rose finkel
+    body_hits: manning 62 143 176 196 218 241 265 293 327 346 382 410 448 471 504 547 599 635
+    body_length: 661
+    pagerank: 4
+  url: http://explorecourses.stanford.edu/instructor/manning
+    title: christopher manning
+    header: christopher manning professor
+    body_hits: manning 33 44 83 96 104
+    body_length: 431
+    pagerank: 4
+    anchor_text: manning c pi
+      stanford_anchor_count: 200
+  url: http://www.stanford.edu/class/cs224n/
+    title: cs 224n ling 284
+    body_hits: manning 37 373 683
+    body_length: 802
+    pagerank: 5
+  url: http://online.stanford.edu/instructors/christopher-manning
+    title: christopher manning stanford online
+    header: christopher manning
+    header: associate professor of computer science and linguistics christopher manning is an associate professor of computer science and linguistics at stanford university chris received a bachelors degree and university medal from the australian national university and a ph d from stanford in 1994 both in linguistics chris taught at carnegie mellon university and the university of sydney before joining the stanford faculty in 1999 he is a fellow of the american association for artificial intelligence and of the association for computational linguistics and is one of the most cited authors in natural language processing for his research on a broad range of statistical natural language topics from tagging and parsing to grammar induction and text understanding courses from this instructor
+    body_hits: manning 18
+    body_length: 41
+    pagerank: 4
+    anchor_text: christopher manning
+      stanford_anchor_count: 1
+  url: http://nlp.stanford.edu/pubs/CICLing2011-manning-tagging.pdf
+    title: part of speech tagging from 97 to 100 is it time for some linguistics
+    body_hits: manning 19 35 8243 8424 8516 8980
+    body_length: 9039
+    pagerank: 5
