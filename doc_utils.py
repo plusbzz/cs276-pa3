@@ -14,6 +14,14 @@ class Document(object):
         return tf
     
     @staticmethod
+    def compute_tf_norm_vector(words,l):
+        l=float(l)
+        tf = Document.compute_tf_vector(words)
+        for w in tf:
+            tf[w] /= l
+        return tf
+    
+    @staticmethod
     def compute_tf_idf_vector(words,corpus):
         tf = Document.compute_tf_vector(words)
         for w in tf:
@@ -76,11 +84,12 @@ class Page(object):
  
         self.field_tf_vectors = self.compute_field_tf_vectors()
 
-    def url_tf_vector(self):
+    def url_tf_vector(self): # parse/split URL
         pass
 
     def header_tf_vector(self):
-        pass
+        words = self.header.strip().split()
+        return Document.compute_tf_norm_vector(words)
 
     def body_tf_vector(self):
         tf = {}
@@ -91,16 +100,21 @@ class Page(object):
         
         return tf
 
-    def title_tf_vector(self):
-        pass
+    def title_tf_vector(self): # should be same/similar to header method
+        words = self.title.strip().split()
+        return Document.compute_tf_norm_vector(words)
 
     def anchor_tf_vector(self):
         pass
 
     def compute_field_tf_vectors(self):
         tfs = {}
-        tfs['body'] = self.body_tf_vector()
-         
+        tfs['url']      = self.url_tf_vector()    # TODO
+        tfs['header']   = self.header_tf_vector()
+        tfs['body']     = self.body_tf_vector()   
+        tfs['title']    = self.title_tf_vector()
+        tfs['anchor']   = self.anchor_tf_vector() # TODO
+        return tfs
         
 class Query(object):
     '''A single query, with all the results associated with it'''
