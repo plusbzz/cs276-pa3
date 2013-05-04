@@ -2,7 +2,33 @@ from collections import Counter
 import os
 from math import log
 
+
+class Document(object):
+    '''Container class for utility static methods'''
+    @staticmethod
+    def compute_tf_vector(words):
+        tf = {}
+        for w in words:
+            if w not in tf: tf[w] = 0
+            tf[w] += 1
+        return tf
+    
+    @staticmethod
+    def compute_tf_idf_vector(words,corpus):
+        tf = Document.compute_tf_vector(words)
+        for w in tf:
+            tf[w] *= corpus.get_IDF(w)
+        return tf
+    
+    @staticmethod
+    def cosine_sim(tf1,tf2):
+        tot = 0.0
+        for term in [k for k in tf1 if k in tf2]:
+            tot += (tf1[term]*tf2[term])
+        return tot
+
 class CorpusInfo(object):
+    '''Represents a corpus, which can be queried for IDF of a term'''
     def __init__(self,corpus_root_dir): # for Laplace smoothing
         self.corpus_dir = corpus_root_dir
         self.total_file_count = 1.0
@@ -32,34 +58,13 @@ class CorpusInfo(object):
         return log(self.df_counter[term]+1.0) - log(self.total_file_count) # for Laplace smoothing
 
 class Anchor(object):
+    '''Properties of a single anchor text chunk'''
     def __init__(self,anchor_text,anchor_count):
         self.text = anchor_text
         self.count = anchor_count
- 
-class Document(object):
-    @staticmethod
-    def compute_tf_vector(words):
-        tf = {}
-        for w in words:
-            if w not in tf: tf[w] = 0
-            tf[w] += 1
-        return tf
-    
-    @staticmethod
-    def compute_tf_idf_vector(words,corpus):
-        tf = Document.compute_tf_vector(words)
-        for w in tf:
-            tf[w] *= corpus.get_IDF(w)
-        return tf
-    
-    @staticmethod
-    def cosine_sim(tf1,tf2):
-        tot = 0.0
-        for term in [k for k in tf1 if k in tf2]:
-            tot += (tf1[term]*tf2[term])
-        return tot
-    
+     
 class Page(object):
+    '''Represents a single web page, with all its fields. Contains TF vectors for the fields'''
     def __init__(self,page,page_fields):
         self.url = page
         self.body_length = page_fields.get('body_length',0)
@@ -98,6 +103,7 @@ class Page(object):
          
         
 class Query(object):
+    '''A single query, with all the results associated with it'''
     def __init__(self,query,query_pages,corpus):  # query_pages : query -> urls
         self.query = query
         self.terms = self.query.strip().split()
