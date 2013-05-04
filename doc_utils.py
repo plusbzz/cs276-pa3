@@ -65,12 +65,19 @@ class Page(object):
         self.body_length = page_fields.get('body_length',0)
         self.pagerank = page_fields.get('pagerank',0)
         self.title = page_fields.get('title',"")
+        self.header = page_fields.get('header',"")
         self.body_hits = page_fields.get('body_hits',0)
         self.anchors = [Anchor(text,count) for text,count in page_fields.get('anchors',{}).iteritems()]
  
         self.field_tf_vectors = self.compute_field_tf_vectors()
-    
-    def body_hits_to_tf_vector(self):
+
+    def url_tf_vector(self):
+        pass
+
+    def header_tf_vector(self):
+        pass
+
+    def body_tf_vector(self):
         tf = {}
         l = float(self.body_length)
         
@@ -78,10 +85,16 @@ class Page(object):
             tf[bh] = len(body_hits[bh])/l
         
         return tf
-           
+
+    def title_tf_vector(self):
+        pass
+
+    def anchor_tf_vector(self):
+        pass
+
     def compute_field_tf_vectors(self):
         tfs = {}
-        tfs['body'] = self.body_hits_to_tf_vector()
+        tfs['body'] = self.body_tf_vector()
          
         
 class Query(object):
