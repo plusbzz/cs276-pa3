@@ -75,6 +75,8 @@ def printRankedResults(queries):
       for res in queries[query]:
         print("  url: " + res)
 
+
+
 #inparams
 #  featureFile: file containing query and url features
 def main(featureFile):
@@ -84,8 +86,10 @@ def main(featureFile):
     #populate map with features from file
     (queries, features) = extractFeatures(featureFile)
 
+    queryObjects = [Query(query,features[query]) for query in features]
+    
     #calling baseline ranking system, replace with yours
-    rankedQueries = baseline(queries, features)
+    #rankedQueries = baseline(queries, features)
     
     #print ranked results to file
     printRankedResults(rankedQueries)

@@ -116,6 +116,7 @@ class Page(object):
         tfs['anchor']   = self.anchor_tf_vector() # TODO
         return tfs
         
+# Look in rank0.main() for how this object is created. Also look at the pa3_play ipython notebook.
 class Query(object):
     '''A single query, with all the results associated with it'''
     def __init__(self,query,query_pages,corpus):  # query_pages : query -> urls
