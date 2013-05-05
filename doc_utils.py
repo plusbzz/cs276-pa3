@@ -1,7 +1,7 @@
 from collections import Counter
 import os
 from math import log
-
+import re
 
 class Document(object):
     '''Container class for utility static methods'''
@@ -78,6 +78,9 @@ class Anchor(object):
             
      
 class Page(object):
+    
+    fields = ['url','header','body','anchor','title']
+    
     '''Represents a single web page, with all its fields. Contains TF vectors for the fields'''
     def __init__(self,page,page_fields):
         self.url = page
@@ -87,11 +90,11 @@ class Page(object):
         self.header = page_fields.get('header',"")
         self.body_hits = page_fields.get('body_hits',0)
         self.anchors = [Anchor(text,count) for text,count in page_fields.get('anchors',{}).iteritems()]
- 
         self.field_tf_vectors = self.compute_field_tf_vectors()
 
     def url_tf_vector(self): # TODO parse/split URL
-        pass
+        words = filter(lambda x: len(x) > 0,re.split('\W',self.url))
+        return Document.compute_tf_norm_vector(words,self.body_length)
 
     def header_tf_vector(self):
         words = reduce(lambda x,h: x+h.strip().split(),self.header,[])
@@ -126,14 +129,44 @@ class Page(object):
         tfs['title']    = self.title_tf_vector()
         tfs['anchor']   = self.anchor_tf_vector() # TODO
         return tfs
+ 
+class QueryPage(object):  
+    field_weights = {
+        'url'   :   1.0,
+        'header':   1.0,
+        'body'  :   1.0,
+        'anchor':   1.0,
+        'title' :   1.0    
+    }
+    
+    def __init__(self,query,page):
+        self.query = query
+        self.page = page
+        self.field_scores = {}
+        self.final_score = 0.0
+        self.compute_cosine_scores()
+        
+    def compute_cosine_scores(self):
+        tf1 = self.query.tf_vector
+        for field in QueryPage.field_weights:
+            tf2 = self.page.field_tf_vectors[field]
+            self.field_scores[field] = Document.cosine_sim(tf1,tf2)
+            self.final_score += (QueryPage.field_weights[field] * self.field_scores[field])
         
 # Look in rank0.main() for how this object is created. Also look at the pa3_play ipython notebook.
 class Query(object):
+
     '''A single query, with all the results associated with it'''
     def __init__(self,query,query_pages,corpus=None):  # query_pages : query -> urls
         self.query = query
         self.terms = self.query.strip().split()
         self.pages = dict([(p,Page(p,v)) for p,v in query_pages.iteritems()]) # URLs
         self.tf_vector = Document.compute_tf_idf_vector(self.terms,corpus)
+        
+    def compute_cosine_scores(self):
+        self.page_scores = [QueryPage(self,page) for p,page in self.pages.iteritems()]       
+        self.ranked_page_scores = [(qp.page.url,qp.final_score) for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
+        self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
+        return self.ranked_pages        
 
         

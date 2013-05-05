@@ -1,6 +1,7 @@
 import sys
 import re
 from math import log
+from doc_utils import *
 
 #inparams
 #  featureFile: input file containing queries and url features
@@ -76,7 +77,9 @@ def printRankedResults(queries):
         print("  url: " + res)
 
 
-
+def cosineRankQueries(features):
+    return dict([(query,Query(query,features[query]).compute_cosine_scores()) for query in features])
+    
 #inparams
 #  featureFile: file containing query and url features
 def main(featureFile):
@@ -86,10 +89,10 @@ def main(featureFile):
     #populate map with features from file
     (queries, features) = extractFeatures(featureFile)
 
-    queryObjects = [Query(query,features[query]) for query in features]
     
     #calling baseline ranking system, replace with yours
     #rankedQueries = baseline(queries, features)
+    rankedQueries = cosineRankQueries(features)
     
     #print ranked results to file
     printRankedResults(rankedQueries)
