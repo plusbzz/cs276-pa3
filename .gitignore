@@ -1,4 +1,5 @@
 queryDoc*
+data/*
 *.py[cod]
 
 # C extensions

@@ -102,17 +102,17 @@ def main(featureFile):
     #print ranked results to file
     printRankedResults(rankedQueries,outputFileName)
     
-    # run experiments
+    # run experiments to determine best cosine weights
     best_weights = QueryPage.field_weights
     best_score = 0.0
     
     for i in xrange(1,10000):
         QueryPage.field_weights = {
-            'url'   :   randint(-10,10),
-            'header':   randint(-10,10),
-            'body'  :   randint(-10,10),
-            'anchor':   randint(-10,10),
-            'title' :   randint(-10,10)    
+            'url'   :   randint(-5,5),
+            'header':   randint(-5,5),
+            'body'  :   randint(-5,5),
+            'anchor':   randint(-5,5),
+            'title' :   randint(-5,5)    
         }
         rankedQueries = cosineRankQueries(features,corpus)
         printRankedResults(rankedQueries,outputFileName)
