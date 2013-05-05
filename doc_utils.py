@@ -7,8 +7,12 @@ import cPickle as marshal
 
 class Document(object):
     '''Container class for utility static methods'''
+    LOGIFY = False
+    NORMALIZE = True
+
     @staticmethod
     def logify(otf):
+        if not Document.LOGIFY: return otf
         tf = {}
         for w in otf:
             tf[w] = (1 + log(otf[w])) if otf[w] > 0 else 0
@@ -26,13 +30,6 @@ class Document(object):
         return tf
     
     @staticmethod
-    def compute_tf_norm_vector(words,length):
-        length=float(length)
-        tf = Document.compute_tf_vector(words)
-        for w in tf: tf[w] = tf[w]/length
-        return tf
-    
-    @staticmethod
     def IDFy(otf,corpus = None):
         tf = {}
         if corpus is not None:
@@ -40,6 +37,15 @@ class Document(object):
                 tf[w] = otf[w]*corpus.get_IDF(w)
         return tf
     
+    @staticmethod
+    def normalize(otf,length):
+        if not Document.NORMALIZE: return otf
+        length=float(length)
+        tf = {}
+        for w in otf:
+            tf[w] = otf[w]/length
+        return tf
+            
     @staticmethod
     def cosine_sim(tf1,tf2):
         n1 = n2 = 1.0
@@ -121,22 +127,21 @@ class Page(object):
 
     def url_tf_vector(self): # TODO parse/split URL
         words = filter(lambda x: len(x) > 0,re.split('\W',self.url))
-        return Document.compute_tf_norm_vector(words,self.body_length)
+        return Document.compute_tf_vector(words)
 
     def header_tf_vector(self):
         words = reduce(lambda x,h: x+h.strip().lower().split(),self.header,[])
-        return Document.compute_tf_norm_vector(words,self.body_length)
+        return Document.compute_tf_vector(words)
 
     def body_tf_vector(self):
         tf = {}
-        l = float(self.body_length)       
         for bh in self.body_hits:
-            tf[bh] = len(self.body_hits[bh])/l       
+            tf[bh] = len(self.body_hits[bh])     
         return tf
 
     def title_tf_vector(self): 
         words = self.title.lower().strip().split() # Can do stemming etc here
-        return Document.compute_tf_norm_vector(words,self.body_length)
+        return Document.compute_tf_vector(words)
 
     def anchor_tf_vector(self):
         tf = {}
@@ -156,6 +161,7 @@ class Page(object):
         tfs['title']    = self.title_tf_vector()
         tfs['anchor']   = self.anchor_tf_vector() # TODO
         
+        for field in tfs: tfs[field] = Document.normalize(tfs[field],self.body_length)
         for field in tfs: tfs[field] = Document.logify(tfs[field])
         return tfs
  
@@ -181,7 +187,10 @@ class QueryPage(object):
             tf2 = self.page.field_tf_vectors[field]
             self.field_scores[field] = Document.cosine_sim(tf1,tf2)
             self.final_score += (QueryPage.field_weights[field] * self.field_scores[field])
-        
+    
+    def compute_bm25f_scores(self):
+        pass
+    
 # Look in rank0.main() for how this object is created. Also look at the pa3_play ipython notebook.
 class Query(object):
 
