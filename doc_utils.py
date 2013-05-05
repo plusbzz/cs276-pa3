@@ -7,7 +7,7 @@ import cPickle as marshal
 
 class Document(object):
     '''Container class for utility static methods'''
-    LOGIFY = False
+    LOGIFY = True
     NORMALIZE = True
 
     @staticmethod
@@ -215,4 +215,6 @@ class Query(object):
         self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
         return self.ranked_pages        
 
-        
+    def compute_bm25f_scores(self):
+        pass
+            
