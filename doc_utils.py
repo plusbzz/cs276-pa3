@@ -1,26 +1,32 @@
 from collections import Counter
-import os
+import os,sys
+from os import path
 from math import log
 import re
+import cPickle as marshal
 
 class Document(object):
     '''Container class for utility static methods'''
     @staticmethod
-    def compute_tf_vector(words,multiplier = 1):
+    def compute_tf_vector(words,multiplier = 1,log_scaling = True):
         tf = {}
         for w in words:
             if w not in tf: tf[w] = 0.0
             tf[w] += 1
         if multiplier > 1:
             for w in tf: tf[w] *= multiplier
+        if log_scaling:
+            for w in tf:
+                if tf[w] > 0:
+                    tf[w] = 1 + log(tf[w])           
         return tf
     
     @staticmethod
-    def compute_tf_norm_vector(words,l):
-        l=float(l)
+    def compute_tf_norm_vector(words,length):
+        length=float(length)
+        #print >> sys.stderr, words,length
         tf = Document.compute_tf_vector(words)
-        for w in tf:
-            tf[w] /= l
+        for w in tf: tf[w] = tf[w]/length
         return tf
     
     @staticmethod
@@ -33,10 +39,16 @@ class Document(object):
     
     @staticmethod
     def cosine_sim(tf1,tf2):
+        n1 = n2 = 1.0
         tot = 0.0
-        for term in [k for k in tf1 if k in tf2]:
-            tot += (tf1[term]*tf2[term])
-        return tot
+        # normalize vectors by L1 norm
+        if len(tf1) > 0 and len(tf2) > 0:
+            n1 = sum(tf1.values())
+            n2 = sum(tf2.values())
+        
+            for term in [k for k in tf1 if k in tf2]:
+                tot += (tf1[term]*tf2[term])
+        return tot/(n1*n2)
 
 class CorpusInfo(object):
     '''Represents a corpus, which can be queried for IDF of a term'''
@@ -64,7 +76,16 @@ class CorpusInfo(object):
                 lines = [line for line in infile.readlines()]
                 tokens = set(reduce(lambda x,line: x+line.strip().split(),lines,[]))   
                 for token in tokens: self.df_counter[token] += 1
+        marshal.dump((self.total_file_count,self.df_counter),open("IDF.dat","wb"))
     
+    def load_doc_freqs(self):
+        if path.isfile("IDF.dat"):
+            print >> sys.stderr, "Loading IDF from file"
+            self.total_file_count,self.df_counter = marshal.load(open("IDF.dat"))
+        else:
+            print >> sys.stderr, "Computing IDF"
+            self.compute_doc_freqs()
+        
     def get_IDF(self,term):
         return log(self.df_counter[term]+1.0) - log(self.total_file_count) # for Laplace smoothing
 
@@ -84,11 +105,14 @@ class Page(object):
     '''Represents a single web page, with all its fields. Contains TF vectors for the fields'''
     def __init__(self,page,page_fields):
         self.url = page
-        self.body_length = page_fields.get('body_length',0)
+        
+        self.body_length = page_fields.get('body_length',1.0)
+        self.body_length = (1.0 if self.body_length == 0 else self.body_length)
+        
         self.pagerank = page_fields.get('pagerank',0)
         self.title = page_fields.get('title',"")
         self.header = page_fields.get('header',"")
-        self.body_hits = page_fields.get('body_hits',0)
+        self.body_hits = page_fields.get('body_hits',{})
         self.anchors = [Anchor(text,count) for text,count in page_fields.get('anchors',{}).iteritems()]
         self.field_tf_vectors = self.compute_field_tf_vectors()
 

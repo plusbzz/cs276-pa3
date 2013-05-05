@@ -42,7 +42,8 @@ def getQueries(rankingFile):
         yield(query, results)
     rankings.close()
 
-def main(myRankFile, groundTruthFile):
+
+def scoreResults(myRankFile, groundTruthFile):
     groundTruth = {}
     ndcgScore = 0.0
     numQueries = 0
@@ -61,8 +62,11 @@ def main(myRankFile, groundTruthFile):
       ndcgScore += getNDCG(results, groundTruth[query])
       numQueries += 1
 
-    print ndcgScore/numQueries
-       
+    return ndcgScore/numQueries
+
+def main(myRankFile, groundTruthFile):
+    print scoreResults(myRankFile, groundTruthFile)
+
 if __name__=='__main__':
     if (len(sys.argv) < 3):
       printUsage()   
