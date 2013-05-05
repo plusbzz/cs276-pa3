@@ -48,16 +48,16 @@ class Document(object):
             
     @staticmethod
     def cosine_sim(tf1,tf2):
-        n1 = n2 = 1.0
+        norm = 1.0
         tot = 0.0
         # normalize vectors by L1 norm
         if len(tf1) > 0 and len(tf2) > 0:
             n1 = sum([abs(v) for v in tf1.values()])
             n2 = sum([abs(v) for v in tf2.values()])
-        
+            norm = n1*n2
             for term in [k for k in tf1 if k in tf2]:
                 tot += (tf1[term]*tf2[term])
-        return tot/(n1*n2)
+        return (tot/norm) if norm > 0 else 0
 
 class CorpusInfo(object):
     '''Represents a corpus, which can be queried for IDF of a term'''
@@ -124,7 +124,16 @@ class Page(object):
         self.body_hits = page_fields.get('body_hits',{})
         self.anchors = [Anchor(text,count) for text,count in page_fields.get('anchors',{}).iteritems()]
         self.field_tf_vectors = self.compute_field_tf_vectors()
-
+        
+        # Combine field vectors
+        self.tf_vector = {}       
+        for field in QueryPage.field_weights:
+            tf_vec = self.field_tf_vectors[field]
+            for term in tf_vec:
+                if term not in self.tf_vector:
+                    self.tf_vector[term] = 0.0
+                self.tf_vector[term] += (QueryPage.field_weights[field] * tf_vec[term])
+                
     def url_tf_vector(self): # TODO parse/split URL
         words = filter(lambda x: len(x) > 0,re.split('\W',self.url))
         return Document.compute_tf_vector(words)
@@ -182,11 +191,8 @@ class QueryPage(object):
         self.compute_cosine_scores()
         
     def compute_cosine_scores(self):
-        tf1 = self.query.tf_vector
-        for field in QueryPage.field_weights:
-            tf2 = self.page.field_tf_vectors[field]
-            self.field_scores[field] = Document.cosine_sim(tf1,tf2)
-            self.final_score += (QueryPage.field_weights[field] * self.field_scores[field])
+        #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
+        self.final_score = Document.cosine_sim(self.query.tf_vector,self.page.tf_vector)
     
     def compute_bm25f_scores(self):
         pass
