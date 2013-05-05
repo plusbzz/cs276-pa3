@@ -28,17 +28,16 @@ class Document(object):
     @staticmethod
     def compute_tf_norm_vector(words,length):
         length=float(length)
-        #print >> sys.stderr, words,length
         tf = Document.compute_tf_vector(words)
         for w in tf: tf[w] = tf[w]/length
         return tf
     
     @staticmethod
-    def compute_tf_idf_vector(words,corpus = None):
-        tf = Document.compute_tf_vector(words)
+    def IDFy(otf,corpus = None):
+        tf = {}
         if corpus is not None:
-            for w in tf:
-                tf[w] *= corpus.get_IDF(w)
+            for w in otf:
+                tf[w] = otf[w]*corpus.get_IDF(w)
         return tf
     
     @staticmethod
@@ -47,8 +46,8 @@ class Document(object):
         tot = 0.0
         # normalize vectors by L1 norm
         if len(tf1) > 0 and len(tf2) > 0:
-            n1 = sum(tf1.values())
-            n2 = sum(tf2.values())
+            n1 = sum([abs(v) for v in tf1.values()])
+            n2 = sum([abs(v) for v in tf2.values()])
         
             for term in [k for k in tf1 if k in tf2]:
                 tot += (tf1[term]*tf2[term])
@@ -91,13 +90,13 @@ class CorpusInfo(object):
             self.compute_doc_freqs()
         
     def get_IDF(self,term):
-        return log(self.df_counter[term]+1.0) - log(self.total_file_count) # for Laplace smoothing
+        return log(self.total_file_count) - log(self.df_counter[term]+1.0) # for Laplace smoothing
 
 class Anchor(object):
     '''Properties of a single anchor text chunk'''
     def __init__(self,anchor_text,anchor_count):
         self.text = anchor_text
-        self.terms = self.text.strip().split()
+        self.terms = self.text.lower().strip().split()
         self.count = anchor_count
         self.term_counts = Document.compute_tf_vector(self.terms,self.count)
             
@@ -125,7 +124,7 @@ class Page(object):
         return Document.compute_tf_norm_vector(words,self.body_length)
 
     def header_tf_vector(self):
-        words = reduce(lambda x,h: x+h.strip().split(),self.header,[])
+        words = reduce(lambda x,h: x+h.strip().lower().split(),self.header,[])
         return Document.compute_tf_norm_vector(words,self.body_length)
 
     def body_tf_vector(self):
@@ -133,10 +132,10 @@ class Page(object):
         l = float(self.body_length)       
         for bh in self.body_hits:
             tf[bh] = len(self.body_hits[bh])/l       
-        return Document.logify(tf)
+        return tf
 
     def title_tf_vector(self): 
-        words = self.title.strip().split() # Can do stemming etc here
+        words = self.title.lower().strip().split() # Can do stemming etc here
         return Document.compute_tf_norm_vector(words,self.body_length)
 
     def anchor_tf_vector(self):
@@ -156,6 +155,8 @@ class Page(object):
         tfs['body']     = self.body_tf_vector()   
         tfs['title']    = self.title_tf_vector()
         tfs['anchor']   = self.anchor_tf_vector() # TODO
+        
+        for field in tfs: tfs[field] = Document.logify(tfs[field])
         return tfs
  
 class QueryPage(object):  
@@ -187,9 +188,11 @@ class Query(object):
     '''A single query, with all the results associated with it'''
     def __init__(self,query,query_pages,corpus=None):  # query_pages : query -> urls
         self.query = query
-        self.terms = self.query.strip().split()
+        self.terms = self.query.lower().strip().split()
         self.pages = dict([(p,Page(p,v)) for p,v in query_pages.iteritems()]) # URLs
-        self.tf_vector = Document.compute_tf_idf_vector(self.terms,corpus)
+        self.tf_vector = Document.compute_tf_vector(self.terms)
+        self.tf_vector = Document.logify(self.tf_vector)
+        self.tf_vector = Document.IDFy(self.tf_vector,corpus)
         
     def compute_cosine_scores(self):
         self.page_scores = [QueryPage(self,page) for p,page in self.pages.iteritems()]       
