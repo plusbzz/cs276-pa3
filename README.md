@@ -1,7 +1,10 @@
-cs276-pa3
-=========
+## CS276: Programming Assignment 3
 
-CS276: Programming Assignment 3
+## Instructions
+Copy the data/ folder over from PA1 to this directory before running anything
+
+
+## Instructions from Staff
 This folder contains the following files:
 
 1. Data
