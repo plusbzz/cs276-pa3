@@ -8,17 +8,21 @@ import cPickle as marshal
 class Document(object):
     '''Container class for utility static methods'''
     @staticmethod
-    def compute_tf_vector(words,multiplier = 1,log_scaling = True):
+    def logify(otf):
+        tf = {}
+        for w in otf:
+            tf[w] = (1 + log(otf[w])) if otf[w] > 0 else 0
+        return tf
+        
+    
+    @staticmethod
+    def compute_tf_vector(words,multiplier = 1):
         tf = {}
         for w in words:
             if w not in tf: tf[w] = 0.0
             tf[w] += 1
         if multiplier > 1:
             for w in tf: tf[w] *= multiplier
-        if log_scaling:
-            for w in tf:
-                if tf[w] > 0:
-                    tf[w] = 1 + log(tf[w])           
         return tf
     
     @staticmethod
@@ -129,7 +133,7 @@ class Page(object):
         l = float(self.body_length)       
         for bh in self.body_hits:
             tf[bh] = len(self.body_hits[bh])/l       
-        return tf
+        return Document.logify(tf)
 
     def title_tf_vector(self): 
         words = self.title.strip().split() # Can do stemming etc here

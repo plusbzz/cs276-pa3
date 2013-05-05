@@ -121,7 +121,7 @@ def main(featureFile):
             best_score = score
             best_weights = QueryPage.field_weights
             print >> sys.stderr, "New best:",best_score,best_weights
-        if i%100 == 0: print >> sys.stderr,"Number of trials:",i
+        if i%100 == 0: print >> sys.stderr,"Number of trials:",i,QueryPage.field_weights
         
 if __name__=='__main__':
     if (len(sys.argv) < 2):
