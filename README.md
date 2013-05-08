@@ -3,6 +3,7 @@
 ## Instructions
 Copy the data/ folder over from PA1 to this directory before running anything
 
+New best: 0.868612756726 {'url': -1705, 'header': -85, 'body': -97, 'anchor': -17, 'title': -288}
 
 ## Instructions from Staff
 This folder contains the following files:

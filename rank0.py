@@ -108,11 +108,11 @@ def main(featureFile):
     
     for i in xrange(1,10000):
         QueryPage.field_weights = {
-            'url'   :   randint(-5,5),
-            'header':   randint(-5,5),
-            'body'  :   randint(-5,5),
-            'anchor':   randint(-5,5),
-            'title' :   randint(-5,5)    
+            'url'   :   randint(-2500,500),
+            'header':   randint(-100,0),
+            'body'  :   randint(-500,0),
+            'anchor':   randint(-50,500),
+            'title' :   randint(-500,0)    
         }
         rankedQueries = cosineRankQueries(features,corpus)
         printRankedResults(rankedQueries,outputFileName)

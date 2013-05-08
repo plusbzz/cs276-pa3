@@ -58,6 +58,38 @@ class Document(object):
             for term in [k for k in tf1 if k in tf2]:
                 tot += (tf1[term]*tf2[term])
         return (tot/norm) if norm > 0 else 0
+    
+    @staticmethod          
+    def url_tf_vector(url): # TODO parse/split URL
+        words = filter(lambda x: len(x) > 0,re.split('\W',url))
+        return Document.compute_tf_vector(words)
+
+    @staticmethod
+    def header_tf_vector(header):
+        words = reduce(lambda x,h: x+h.strip().lower().split(),header,[])
+        return Document.compute_tf_vector(words)
+
+    @staticmethod
+    def body_tf_vector(body_hits):
+        tf = {}
+        for bh in body_hits:
+            tf[bh] = len(body_hits[bh])     
+        return tf
+
+    @staticmethod
+    def title_tf_vector(title): 
+        words = title.lower().strip().split() # Can do stemming etc here
+        return Document.compute_tf_vector(words)
+
+    @staticmethod
+    def anchor_tf_vector(anchors):
+        tf = {}
+        for a in anchors:
+            atf = a.term_counts
+            for term in atf:
+                if term not in tf: tf[term] = 0.0
+                tf[term] += atf[term]
+        return tf
 
 class CorpusInfo(object):
     '''Represents a corpus, which can be queried for IDF of a term'''
@@ -116,7 +148,7 @@ class Page(object):
         self.url = page
         
         self.body_length = page_fields.get('body_length',1.0)
-        self.body_length = (1.0 if self.body_length == 0 else self.body_length)
+        self.body_length = max(1000.0,self.body_length) #(500.0 if self.body_length == 0 else self.body_length)
         
         self.pagerank = page_fields.get('pagerank',0)
         self.title = page_fields.get('title',"")
@@ -134,41 +166,14 @@ class Page(object):
                     self.tf_vector[term] = 0.0
                 self.tf_vector[term] += (QueryPage.field_weights[field] * tf_vec[term])
                 
-    def url_tf_vector(self): # TODO parse/split URL
-        words = filter(lambda x: len(x) > 0,re.split('\W',self.url))
-        return Document.compute_tf_vector(words)
-
-    def header_tf_vector(self):
-        words = reduce(lambda x,h: x+h.strip().lower().split(),self.header,[])
-        return Document.compute_tf_vector(words)
-
-    def body_tf_vector(self):
-        tf = {}
-        for bh in self.body_hits:
-            tf[bh] = len(self.body_hits[bh])     
-        return tf
-
-    def title_tf_vector(self): 
-        words = self.title.lower().strip().split() # Can do stemming etc here
-        return Document.compute_tf_vector(words)
-
-    def anchor_tf_vector(self):
-        tf = {}
-        for a in self.anchors:
-            atf = a.term_counts
-            for term in atf:
-                if term not in tf: tf[term] = 0.0
-                tf[term] += atf[term]
-        for term in tf: tf[term] /= self.body_length # normalize
-        return tf
 
     def compute_field_tf_vectors(self):
         tfs = {}
-        tfs['url']      = self.url_tf_vector()    # TODO
-        tfs['header']   = self.header_tf_vector()
-        tfs['body']     = self.body_tf_vector()   
-        tfs['title']    = self.title_tf_vector()
-        tfs['anchor']   = self.anchor_tf_vector() # TODO
+        tfs['url']      = Document.url_tf_vector(self.url)
+        tfs['header']   = Document.header_tf_vector(self.header)
+        tfs['body']     = Document.body_tf_vector(self.body_hits)   
+        tfs['title']    = Document.title_tf_vector(self.title)
+        tfs['anchor']   = Document.anchor_tf_vector(self.anchors)
         
         for field in tfs: tfs[field] = Document.normalize(tfs[field],self.body_length)
         for field in tfs: tfs[field] = Document.logify(tfs[field])
