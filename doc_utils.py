@@ -5,14 +5,14 @@ from math import log
 import re
 import cPickle as marshal
 
-class Document(object):
+class DocUtils(object):
     '''Container class for utility static methods'''
     LOGIFY = True
     NORMALIZE = True
 
     @staticmethod
     def logify(otf):
-        if not Document.LOGIFY: return otf
+        if not DocUtils.LOGIFY: return otf
         tf = {}
         for w in otf:
             tf[w] = (1 + log(otf[w])) if otf[w] > 0 else 0
@@ -39,7 +39,7 @@ class Document(object):
     
     @staticmethod
     def normalize(otf,length):
-        if not Document.NORMALIZE: return otf
+        if not DocUtils.NORMALIZE: return otf
         length=float(length)
         tf = {}
         for w in otf:
@@ -62,12 +62,12 @@ class Document(object):
     @staticmethod          
     def url_tf_vector(url): # TODO parse/split URL
         words = filter(lambda x: len(x) > 0,re.split('\W',url))
-        return Document.compute_tf_vector(words)
+        return DocUtils.compute_tf_vector(words)
 
     @staticmethod
     def header_tf_vector(header):
         words = reduce(lambda x,h: x+h.strip().lower().split(),header,[])
-        return Document.compute_tf_vector(words)
+        return DocUtils.compute_tf_vector(words)
 
     @staticmethod
     def body_tf_vector(body_hits):
@@ -79,7 +79,7 @@ class Document(object):
     @staticmethod
     def title_tf_vector(title): 
         words = title.lower().strip().split() # Can do stemming etc here
-        return Document.compute_tf_vector(words)
+        return DocUtils.compute_tf_vector(words)
 
     @staticmethod
     def anchor_tf_vector(anchors):
@@ -136,7 +136,7 @@ class Anchor(object):
         self.text = anchor_text
         self.terms = self.text.lower().strip().split()
         self.count = anchor_count
-        self.term_counts = Document.compute_tf_vector(self.terms,self.count)
+        self.term_counts = DocUtils.compute_tf_vector(self.terms,self.count)
             
      
 class Page(object):
@@ -159,35 +159,58 @@ class Page(object):
         
         # Combine field vectors
         self.tf_vector = {}       
-        for field in QueryPage.field_weights:
+        for field in QueryPage.cosine_w:
             tf_vec = self.field_tf_vectors[field]
             for term in tf_vec:
                 if term not in self.tf_vector:
                     self.tf_vector[term] = 0.0
-                self.tf_vector[term] += (QueryPage.field_weights[field] * tf_vec[term])
+                self.tf_vector[term] += (QueryPage.cosine_w[field] * tf_vec[term])
                 
 
     def compute_field_tf_vectors(self):
         tfs = {}
-        tfs['url']      = Document.url_tf_vector(self.url)
-        tfs['header']   = Document.header_tf_vector(self.header)
-        tfs['body']     = Document.body_tf_vector(self.body_hits)   
-        tfs['title']    = Document.title_tf_vector(self.title)
-        tfs['anchor']   = Document.anchor_tf_vector(self.anchors)
+        tfs['url']      = DocUtils.url_tf_vector(self.url)
+        tfs['header']   = DocUtils.header_tf_vector(self.header)
+        tfs['body']     = DocUtils.body_tf_vector(self.body_hits)   
+        tfs['title']    = DocUtils.title_tf_vector(self.title)
+        tfs['anchor']   = DocUtils.anchor_tf_vector(self.anchors)
         
-        for field in tfs: tfs[field] = Document.normalize(tfs[field],self.body_length)
-        for field in tfs: tfs[field] = Document.logify(tfs[field])
+        for field in tfs: tfs[field] = DocUtils.normalize(tfs[field],self.body_length)
+        for field in tfs: tfs[field] = DocUtils.logify(tfs[field])
         return tfs
- 
+
+class DocInfo(object):
+    '''Class for non-query-relevant aspects of pages'''
+    pages = {}
+    
+    @staticmethod
+    def add_page(page):
+        if page.url not in pages:
+            pass
+            
 class QueryPage(object):  
-    field_weights = {
+    cosine_w = {
         'url'   :   1.0,
         'header':   1.0,
         'body'  :   1.0,
         'anchor':   1.0,
         'title' :   1.0    
     }
-    
+    bm25f_B = {
+        'url'   :   1.0,
+        'header':   1.0,
+        'body'  :   1.0,
+        'anchor':   1.0,
+        'title' :   1.0    
+    }
+    bm25f_W = {
+        'url'   :   1.0,
+        'header':   1.0,
+        'body'  :   1.0,
+        'anchor':   1.0,
+        'title' :   1.0    
+    }
+        
     def __init__(self,query,page):
         self.query = query
         self.page = page
@@ -197,7 +220,7 @@ class QueryPage(object):
         
     def compute_cosine_scores(self):
         #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
-        self.final_score = Document.cosine_sim(self.query.tf_vector,self.page.tf_vector)
+        self.final_score = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
     
     def compute_bm25f_scores(self):
         pass
@@ -210,9 +233,9 @@ class Query(object):
         self.query = query
         self.terms = self.query.lower().strip().split()
         self.pages = dict([(p,Page(p,v)) for p,v in query_pages.iteritems()]) # URLs
-        self.tf_vector = Document.compute_tf_vector(self.terms)
-        self.tf_vector = Document.logify(self.tf_vector)
-        self.tf_vector = Document.IDFy(self.tf_vector,corpus)
+        self.tf_vector = DocUtils.compute_tf_vector(self.terms)
+        self.tf_vector = DocUtils.logify(self.tf_vector)
+        self.tf_vector = DocUtils.IDFy(self.tf_vector,corpus)
         
     def compute_cosine_scores(self):
         self.page_scores = [QueryPage(self,page) for p,page in self.pages.iteritems()]       

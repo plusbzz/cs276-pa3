@@ -103,11 +103,11 @@ def main(featureFile):
     printRankedResults(rankedQueries,outputFileName)
     
     # run experiments to determine best cosine weights
-    best_weights = QueryPage.field_weights
+    best_weights = QueryPage.cosine_w
     best_score = 0.0
     
     for i in xrange(1,10000):
-        QueryPage.field_weights = {
+        QueryPage.cosine_w = {
             'url'   :   randint(-2500,500),
             'header':   randint(-100,0),
             'body'  :   randint(-500,0),
@@ -119,9 +119,9 @@ def main(featureFile):
         score = ndcg.scoreResults(outputFileName,'queryDocTrainRel')        
         if score > best_score:
             best_score = score
-            best_weights = QueryPage.field_weights
+            best_weights = QueryPage.cosine_w
             print >> sys.stderr, "New best:",best_score,best_weights
-        if i%100 == 0: print >> sys.stderr,"Number of trials:",i,QueryPage.field_weights
+        if i%100 == 0: print >> sys.stderr,"Number of trials:",i,QueryPage.cosine_w
         
 if __name__=='__main__':
     if (len(sys.argv) < 2):
