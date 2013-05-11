@@ -9,6 +9,20 @@ class DocUtils(object):
     '''Container class for utility static methods'''
     LOGIFY = True
     NORMALIZE = True
+    
+    @staticmethod
+    def compute_bm25f_rawtf_vector(queryTerms):
+        """
+        Returns a List of Lists e.g.
+        [ term1_list, term2_list, ... , termn_list]
+        
+        Where termn_list = [termn_raw_frequency_url, termn_raw_frequency_title, termn_raw_frequency_header, termn_raw_frequency_body, termn_raw_frequency_anchor]
+        """
+        
+        raw_frequences_per_term = []
+        for term in queryTerms:
+            term_raw_frequency = []
+            result.append(term_raw_frequency)            
 
     @staticmethod
     def logify(otf):
@@ -194,7 +208,7 @@ class QueryPage(object):
         'header':   1.0,
         'body'  :   1.0,
         'anchor':   1.0,
-        'title' :   1.0    
+        'title' :   1.0     
     }
     bm25f_B = {
         'url'   :   1.0,
@@ -243,6 +257,33 @@ class Query(object):
         self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
         return self.ranked_pages        
 
+<<<<<<< HEAD
     def compute_bm25f_scores(self):
         pass
             
+=======
+class QueryBM25F(object):
+
+    '''A single query, with all the results associated with it'''
+    def __init__(self,query,query_pages,corpus=None):  # query_pages : query -> urls
+        #self.query = query
+        #self.terms = self.query.lower().strip().split()
+        #self.pages = dict([(p,Page(p,v)) for p,v in query_pages.iteritems()]) # URLs
+        
+        #self.raw_tf_vector = Document.compute_bm25f_rawtf_vector(self.terms) # vector of vectors
+        
+        #self.tf_vector = Document.compute_tf_vector(self.terms)
+        #self.tf_vector = Document.logify(self.tf_vector)
+        #self.tf_vector = Document.IDFy(self.tf_vector,corpus)
+        pass
+        
+    def compute_bm25f_scores(self):
+        #self.page_scores = [QueryPage(self,page) for p,page in self.pages.iteritems()]       
+        #self.ranked_page_scores = [(qp.page.url,qp.final_score) for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
+        #self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
+        
+        self.ranked_pages = ["url1","url2","url3"]
+        return self.ranked_pages        
+
+        
+>>>>>>> BM25F re-implement draft
