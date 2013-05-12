@@ -354,12 +354,12 @@ class QueryPageBM25F(object):
     bm25f_B = [1.0, 1.0, 1.0, 1.0, 1.0]     # [url,title,header,body,anchor]
     bm25f_W = [1.0, 1.0, 1.0, 1.0, 1.0]     # [url,title,header,body,anchor]
     
-    K1          = 1
-    lamd        = 1
+    K1          = 1.0
+    lamd        = 1.0
     
     Vf          = None
-    lamd_prime  = 1
-    lamd_prime2 = 1
+    lamd_prime  = 1.0
+    lamd_prime2 = 1.0
     
         
     def __init__(self,query,page,fields_avg_len,corpus):
@@ -374,10 +374,10 @@ class QueryPageBM25F(object):
             
     def compute_bm25f_scores(self):
         terms_raw_tf_per_field = [ self.page.compute_raw_tf_vector(term) for term in self.query.terms ]  # e.g. [ [1 3 4 1 3], [4 5 2 1 2] ]
-        print >> sys.stderr, "Query: " + self.query.query
-        print >> sys.stderr, "Query Terms: " + str(self.query.terms)
-        print >> sys.stderr, "Page: " + self.page.url
-        print >> sys.stderr, "query_terms_raw_tf_per_field: " + str(terms_raw_tf_per_field)
+        #print >> sys.stderr, "Query: " + self.query.query
+        #print >> sys.stderr, "Query Terms: " + str(self.query.terms)
+        #print >> sys.stderr, "Page: " + self.page.url
+        #print >> sys.stderr, "query_terms_raw_tf_per_field: " + str(terms_raw_tf_per_field)
         
         # Field dependent normalized tf per term
         fdn_tf = []
