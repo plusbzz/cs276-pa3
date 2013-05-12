@@ -11,17 +11,17 @@ class DocUtils(object):
     NORMALIZE = True
     
     @staticmethod
-    def calculateRawFrequencies(term, queryPages):
-        return dict([(url, page.compute_raw_tf_vector(term)) for url,page in queryPages.iteritems()])
+    def calculate_term_raw_frequencies(term, page):
+        return dict([(page.url, page.compute_raw_tf_vector(term))])
             
     @staticmethod
-    def compute_bm25f_rawtf_map(queryTerms, queryPages):
+    def compute_bm25f_rawtf(queryTerms, page):
         """
         Retuns a map from queryTerm to queryFrequency
         queryFrequency is a map from url to rawFrequencies
         rawFrequencies is a list [term_raw_frequency_url, term_raw_frequency_title, term_raw_frequency_header, term_raw_frequency_body, term_raw_frequency_anchor]
         """
-        return dict([ (term, DocUtils.calculateRawFrequencies(term,queryPages)) for term in queryTerms])
+        return dict([ (term, DocUtils.calculate_term_raw_frequencies(term,page)) for term in queryTerms])
     
     @staticmethod
     def logify(otf):
@@ -105,8 +105,8 @@ class DocUtils(object):
         return tf
     
     @staticmethod
-    def avgLen(features):
-        ''' Gets the average length of each each field (body, url, title, header, anchor)'''
+    def features_avg_len(features):
+        ''' Returns a list with the avg length of the page features in this format [url,title,header,body,anchor] '''
             
         body_length = 'body_length'
         title       = 'title'
@@ -123,17 +123,17 @@ class DocUtils(object):
         
         for query in features:
             for url in features[query]:
-                process_body_length(body_length, body_counts, features[query][url])
-                process_title_length(title, title_counts, features[query][url])
-                process_header_length(header, header_counts, features[query][url])
-                process_anchor_length(anchor, anchor_counts, features[query][url])
-                process_url_length(url_counts,url)
-    
-        return {'body':    body_counts[1]   / float(body_counts[0]) if body_counts[0] != 0 else 0.0,
-                'url':     url_counts[1]    / float(url_counts[0]) if url_counts[0] != 0 else 0.0,
-                'title':   title_counts[1]  / float(title_counts[0]) if title_counts[0] != 0 else 0.0,
-                'headers': header_counts[1] / float(header_counts[0]) if header_counts[0] != 0 else 0.0,
-                'anchors': anchor_counts[1] / float(anchor_counts[0]) if anchor_counts[0] != 0 else 0.0}
+                DocUtils.process_body_length(body_length, body_counts, features[query][url])
+                DocUtils.process_title_length(title, title_counts, features[query][url])
+                DocUtils.process_header_length(header, header_counts, features[query][url])
+                DocUtils.process_anchor_length(anchor, anchor_counts, features[query][url])
+                DocUtils.process_url_length(url_counts,url)
+                
+        return [ url_counts[1]    / float(url_counts[0]) if url_counts[0] != 0 else 0.0,
+                 title_counts[1]  / float(title_counts[0]) if title_counts[0] != 0 else 0.0,
+                 header_counts[1] / float(header_counts[0]) if header_counts[0] != 0 else 0.0,
+                 body_counts[1]   / float(body_counts[0]) if body_counts[0] != 0 else 0.0,
+                 anchor_counts[1] / float(anchor_counts[0]) if anchor_counts[0] != 0 else 0.0 ]
         
     @staticmethod        
     def process_url_length(url_counts, url_content):
@@ -262,7 +262,7 @@ class Page(object):
 
 class PageBM25F(object):
     
-    fields = ['url','header','body','anchor','title']
+    fields = ['url', 'title','header','body','anchor']
     
     '''Represents a single web page, with all its fields. Contains TF vectors for the fields'''
     def __init__(self,page,page_fields):
@@ -283,29 +283,26 @@ class PageBM25F(object):
         self.anchors_content = [ item for anchor in self.anchors for item in anchor.strip().split() ]
         
         self.body_hits = page_fields.get('body_hits',{})
-        self.pagerank = page_fields.get('pagerank',0)
-        
-        self.field_length = {'url':len(self.url_content),
-                             'title':len(self.title_content),
-                             'headers':len(self.headers_content),
-                             'body':self.body_length,
-                             'anchors':len(self.anchors_content)}
+        self.pagerank  = page_fields.get('pagerank',0)
+                
+        # [url,title,header,body,anchors]
+        self.fields_length = [ len(self.url_content), len(self.title_content), len(self.headers_content), self.body_length, len(self.anchors_content) ]
         
     def raw_tf_in_url(self, term):
-        return self.url_content.count(term)
+        return float(self.url_content.count(term))
     
     def raw_tf_in_title(self, term):
-        return self.title_content.count(term)
+        return float(self.title_content.count(term))
     
     def raw_tf_in_headers(self, term):
-        return self.headers_content.count(term)
+        return float(self.headers_content.count(term))
     
     def raw_tf_in_body(self, term):
         term_postings = self.body_hits.get(term,[])
-        return len(term_postings)
+        return float(len(term_postings))
     
     def raw_tf_in_anchors(self, term):
-        return self.anchors_content.count(term)
+        return float(self.anchors_content.count(term))
 
     def compute_raw_tf_vector(self, term):
         """
@@ -339,20 +336,6 @@ class QueryPage(object):
         'anchor':   1.0,
         'title' :   1.0     
     }
-    bm25f_B = {
-        'url'   :   1.0,
-        'header':   1.0,
-        'body'  :   1.0,
-        'anchor':   1.0,
-        'title' :   1.0    
-    }
-    bm25f_W = {
-        'url'   :   1.0,
-        'header':   1.0,
-        'body'  :   1.0,
-        'anchor':   1.0,
-        'title' :   1.0    
-    }
         
     def __init__(self,query,page):
         self.query = query
@@ -365,9 +348,72 @@ class QueryPage(object):
         #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
         self.final_score = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
     
-    def compute_bm25f_scores(self):
-        pass
     
+class QueryPageBM25F(object):
+    
+    bm25f_B = [1.0, 1.0, 1.0, 1.0, 1.0]     # [url,title,header,body,anchor]
+    bm25f_W = [1.0, 1.0, 1.0, 1.0, 1.0]     # [url,title,header,body,anchor]
+    
+    K1         = 1
+    lambd      = 1
+    Vf         = None
+    lambd_prime = 1
+    
+        
+    def __init__(self,query,page,fields_avg_len,corpus):
+        self.query = query
+        self.page = page
+        self.field_scores = {}
+        self.final_score = 0.0
+        self.fields_avg_len = fields_avg_len
+        self.corpus = corpus        
+        self.compute_bm25f_scores()
+
+            
+    def compute_bm25f_scores(self):
+        terms_raw_tf_per_field = [ self.page.compute_raw_tf_vector(term) for term in self.query.terms ]  # e.g. [ [1 3 4 1 3], [4 5 2 1 2] ]
+        print >> sys.stderr, "Query: " + self.query.query
+        print >> sys.stderr, "Query Terms: " + str(self.query.terms)
+        print >> sys.stderr, "Page: " + self.page.url
+        print >> sys.stderr, "query_terms_raw_tf_per_field: " + str(terms_raw_tf_per_field)
+        
+        # Field dependent normalized tf per term
+        fdn_tf = []
+        for term_raw_tf in terms_raw_tf_per_field:
+            fdn_tf.append( self.compute_fdn_tf(term_raw_tf, QueryPageBM25F.bm25f_B, self.page.fields_length, self.fields_avg_len) )
+            
+        # Overall weight for each term in this page, across all fields
+        weight_tf = [self.compute_weight_tf(term_fdn, QueryPageBM25F.bm25f_W) for term_fdn in fdn_tf]
+        
+        # Overall score of this page for this query
+        self.final_score = self.compute_final_score(self.query.terms, weight_tf, QueryPageBM25F.K1, QueryPageBM25F.lambd, QueryPageBM25F.lambd_prime, QueryPageBM25F.Vf, self.page.pagerank, self.corpus);
+        
+    
+    def compute_fdn_tf(self, raw_tf, B, page_fields_length, fields_avg_len):
+        fdn_tf = []
+        for idx in xrange(len(raw_tf)):
+            B_prime = 1 + B[idx]*(page_fields_length[idx]/fields_avg_len[idx] - 1)
+            fdn_tf.append( 0.0 if fields_avg_len[idx]==0.0 or B_prime == 0 else (raw_tf[idx] / B_prime) )
+            
+        return fdn_tf
+    
+    def compute_weight_tf(self, fdn_tf, W):
+        weight_tf = 0
+        for idx in xrange(len(fdn_tf)):
+            weight_tf += fdn_tf[idx] * W[idx]
+        
+        return weight_tf
+    
+    def compute_final_score(self, terms, weight_tf, K1, lambd, lambd_prime, Vf, pagerank, corpus):
+        final_score = 0
+        for idx in xrange(len(terms)):
+            final_score += (weight_tf[idx] * corpus.get_IDF(terms[idx])) / (K1 + weight_tf[idx])
+         
+        #TODO!!   
+        #final_score += lambd * Vf(lambd_prime, pagerank)
+        
+        return final_score
+        
 # Look in rank0.main() for how this object is created. Also look at the pa3_play ipython notebook.
 class Query(object):
 
@@ -386,33 +432,20 @@ class Query(object):
         self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
         return self.ranked_pages        
 
-    def compute_bm25f_scores(self):
-        pass
-            
-
 class QueryBM25F(object):
     
     '''A single query, with all the results associated with it'''
-    def __init__(self,query,query_pages,corpus=None):  # query_pages : query -> urls
+    def __init__(self,query,query_pages,fields_avg_length,corpus):  # query_pages : query -> urls
         self.query = query
         self.terms = self.query.lower().strip().split()
         self.pages = dict([(p,PageBM25F(p,v)) for p,v in query_pages.iteritems()]) # URLs
-        self.raw_tf_map = DocUtils.compute_bm25f_rawtf_map(self.terms, self.pages)
-        
-        for term,freq in self.raw_tf_map.iteritems():
-            for url,freqList in freq.iteritems():
-                print term + " - " + url + " - " + str(freqList)
-            
-        
-        #self.tf_vector = Document.compute_tf_vector(self.terms)
-        #self.tf_vector = Document.logify(self.tf_vector)
-        #self.tf_vector = Document.IDFy(self.tf_vector,corpus)
-        pass
+        self.fields_avg_length = fields_avg_length
+        self.corpus = corpus
+
         
     def compute_bm25f_scores(self):
-        #self.page_scores = [QueryPage(self,page) for p,page in self.pages.iteritems()]       
-        #self.ranked_page_scores = [(qp.page.url,qp.final_score) for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
-        #self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
+        self.page_scores = [QueryPageBM25F(self,page,self.fields_avg_length,self.corpus) for p,page in self.pages.iteritems()]       
+        self.ranked_page_scores = [(qp.page.url,qp.final_score) for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
+        self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
         
-        self.ranked_pages = ["url1","url2","url3"]
         return self.ranked_pages        

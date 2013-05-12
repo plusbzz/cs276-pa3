@@ -82,8 +82,8 @@ def printRankedResults(queries,outFileName):
 def cosineRankQueries(features,corpus = None):
     return dict([(query,Query(query,features[query],corpus).compute_cosine_scores()) for query in features])
 
-def bm25fRankQueries(features,corpus = None):
-    return dict([(query,QueryBM25F(query,features[query],corpus).compute_bm25f_scores()) for query in features])
+def bm25fRankQueries(features, features_avg_len, corpus):
+    return dict([(query,QueryBM25F(query,features[query],features_avg_len, corpus).compute_bm25f_scores()) for query in features])
     
     
 #inparams
@@ -100,8 +100,8 @@ def main(featureFile):
     (queries, features) = extractFeatures(featureFile)
   
     #calling baseline ranking system, replace with yours
-    rankedQueries = bm25fRankQueries(features,corpus)
-    
+    rankedQueries = bm25fRankQueries(features,DocUtils.features_avg_len(features),corpus)
+        
     #print ranked results to file
     printRankedResults(rankedQueries,outputFileName)
     
