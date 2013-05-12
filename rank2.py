@@ -79,78 +79,12 @@ def printRankedResults(queries,outFileName):
             for res in queries[query]:
                 print >> outfile, ("  url: " + res)
 
-
-def avgLen(features):
-    ''' Gets the average length of each each field (body, url, title, header, anchor)'''
-        
-    body_length = 'body_length'
-    title       = 'title'
-    header      = 'header'
-    anchor      = 'anchors'
-    url         = 'url'
-    
-    # (total_count, total_sum)
-    body_counts   = [0,0] 
-    title_counts  = [0,0]
-    header_counts = [0,0]
-    anchor_counts = [0,0]
-    url_counts    = [0,0]
-    
-    for query in features:
-        for url in features[query]:
-            process_body(body_length, body_counts, features[query][url])
-            process_title(title, title_counts, features[query][url])
-            process_header(header, header_counts, features[query][url])
-            process_anchor(anchor, anchor_counts, features[query][url])
-            process_url(url_counts,url)
-
-    return {'body':   body_counts[1]   / float(body_counts[0]) if body_counts[0] != 0 else 0.0,
-            'url':    url_counts[1]    / float(url_counts[0]) if url_counts[0] != 0 else 0.0,
-            'title':  title_counts[1]  / float(title_counts[0]) if title_counts[0] != 0 else 0.0,
-            'header': header_counts[1] / float(header_counts[0]) if header_counts[0] != 0 else 0.0,
-            'anchor': anchor_counts[1] / float(anchor_counts[0]) if anchor_counts[0] != 0 else 0.0}
-    
-def process_url(url_counts, url_content):
-    url_terms      = filter(lambda x: len(x) > 0, re.split('\W',url_content))
-    url_counts[0] += 1
-    url_counts[1] += len(url_terms)
-    
-def process_body(body_length, body_counts, url):
-    body_counts[0] += 1
-    if body_length in url:
-        body_counts[1] += int(url[body_length])
-        
-
-def process_title(title, title_counts, url):
-    title_counts[0] += 1
-    if title in url:
-        title_counts[1] += len(url[title].strip().split())
-
-def process_header(header, header_counts, url):
-    if header in url:
-        header_content    = url[header] # header_content is a List of Strings
-        header_counts[0] += len(header_content)     
-        header_counts[1] += sum([len(header.strip().split()) for header in header_content])
-    else:
-        header_counts[0] += 1
-
-def process_anchor(anchor, anchor_counts, url):
-    if anchor in url:
-        anchor_content = url[anchor] # anchor_content is a dictionary with key=anchor_text, value=stanford_anchor_count
-        anchor_counts[0] += len(anchor_content)
-        anchor_counts[1] += sum([len(anchor.strip().split()) for anchor in anchor_content])
-    else:
-        anchor_counts[0] +=1
-
-
 def cosineRankQueries(features,corpus = None):
     return dict([(query,Query(query,features[query],corpus).compute_cosine_scores()) for query in features])
 
 def bm25fRankQueries(features,corpus = None):
     return dict([(query,QueryBM25F(query,features[query],corpus).compute_bm25f_scores()) for query in features])
     
-    #return dict([("query1",["url1","url2","url3"]),("query2",["url4","url5","url6"]),("query3",["url7","url8","url9"])])
-
     
 #inparams
 #  featureFile: file containing query and url features
