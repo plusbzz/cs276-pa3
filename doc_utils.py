@@ -354,10 +354,12 @@ class QueryPageBM25F(object):
     bm25f_B = [1.0, 1.0, 1.0, 1.0, 1.0]     # [url,title,header,body,anchor]
     bm25f_W = [1.0, 1.0, 1.0, 1.0, 1.0]     # [url,title,header,body,anchor]
     
-    K1         = 1
-    lambd      = 1
-    Vf         = None
-    lambd_prime = 1
+    K1          = 1
+    lamd        = 1
+    
+    Vf          = None
+    lamd_prime  = 1
+    lamd_prime2 = 1
     
         
     def __init__(self,query,page,fields_avg_len,corpus):
@@ -386,7 +388,7 @@ class QueryPageBM25F(object):
         weight_tf = [self.compute_weight_tf(term_fdn, QueryPageBM25F.bm25f_W) for term_fdn in fdn_tf]
         
         # Overall score of this page for this query
-        self.final_score = self.compute_final_score(self.query.terms, weight_tf, QueryPageBM25F.K1, QueryPageBM25F.lambd, QueryPageBM25F.lambd_prime, QueryPageBM25F.Vf, self.page.pagerank, self.corpus);
+        self.final_score = self.compute_final_score(self.query.terms, weight_tf, QueryPageBM25F.K1, QueryPageBM25F.lamd, QueryPageBM25F.lamd_prime, QueryPageBM25F.lamd_prime2, QueryPageBM25F.Vf, self.page.pagerank, self.corpus);
         
     
     def compute_fdn_tf(self, raw_tf, B, page_fields_length, fields_avg_len):
@@ -404,13 +406,13 @@ class QueryPageBM25F(object):
         
         return weight_tf
     
-    def compute_final_score(self, terms, weight_tf, K1, lambd, lambd_prime, Vf, pagerank, corpus):
+    def compute_final_score(self, terms, weight_tf, K1, lamd, lamd_prime, lamd_prime2, Vf, pagerank, corpus):
         final_score = 0
         for idx in xrange(len(terms)):
             final_score += (weight_tf[idx] * corpus.get_IDF(terms[idx])) / (K1 + weight_tf[idx])
          
-        #TODO!!   
-        #final_score += lambd * Vf(lambd_prime, pagerank)
+        # Non-textual feature (pagerank)   
+        final_score += lamd * Vf(self, lamd_prime, pagerank, lamd_prime2)
         
         return final_score
         

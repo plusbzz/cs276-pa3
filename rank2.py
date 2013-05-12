@@ -1,6 +1,6 @@
 import sys
 import re
-from math import log
+from math import log,exp
 from doc_utils import *
 from random import randint
 import ndcg
@@ -84,7 +84,18 @@ def cosineRankQueries(features,corpus = None):
 
 def bm25fRankQueries(features, features_avg_len, corpus):
     return dict([(query,QueryBM25F(query,features[query],features_avg_len, corpus).compute_bm25f_scores()) for query in features])
-    
+
+def v_logarithmic(self, lamda_prime, field, lamda_prime2=1):
+    value = lamda_prime + field
+    return log(value) if value > 0 else 0
+
+def v_saturation(self, lamda_prime, field, lamda_prime2=1):
+    den   = lamda_prime + field
+    return (float(field) / den) if den > 0 else 0 
+
+def v_sigmoid(self, lamda_prime, field, lamda_prime2=1):
+    den = lamda_prime + exp(-field*lamda_prime2)
+    return (1.0 / den) if den > 0  else 0
     
 #inparams
 #  featureFile: file containing query and url features
@@ -98,6 +109,8 @@ def main(featureFile):
     
     #populate map with features from file
     (queries, features) = extractFeatures(featureFile)
+    
+    QueryPageBM25F.Vf = v_logarithmic
   
     #calling baseline ranking system, replace with yours
     rankedQueries = bm25fRankQueries(features,DocUtils.features_avg_len(features),corpus)
