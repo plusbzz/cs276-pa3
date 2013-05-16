@@ -3,7 +3,75 @@ import os,sys
 from os import path
 from math import log
 import re
+import types
 import cPickle as marshal
+
+class SmallestWindowUtils(object):
+    '''Container class for SmallestWindow utility static methods'''
+    
+    @staticmethod
+    def get_query_terms_postings_in_field(queryTerms, field):
+        query_terms_postings = {}
+        
+        if isinstance(field,list):
+            for term in queryTerms:
+                if term in field:
+                    query_terms_postings[term] = [p for p in range(len(field)) if term == field[p]]
+                else:
+                    return {} # the field does not contain all query terms
+                
+        elif isinstance(field,dict):
+            for term in queryTerms:
+                if term in field:
+                    query_terms_postings[term] = field[term]
+                else:
+                    return {}
+
+        return query_terms_postings
+
+
+    @staticmethod
+    def get_smallest_window_size(query_terms_posting_list):
+        INFINITE = sys.maxsize
+        
+        query_terms_position = {}
+        for qt in query_terms_posting_list:
+            query_terms_position[qt] = 0
+            
+        smallest_window_size = INFINITE - 1
+        
+        while SmallestWindowUtils.is_query_terms_position_valid(query_terms_position, query_terms_posting_list):
+            smallest_window_size = min([smallest_window_size, SmallestWindowUtils.get_window_size(query_terms_position, query_terms_posting_list)])
+            query_terms_position = SmallestWindowUtils.update_query_terms_position(query_terms_position, query_terms_posting_list)
+            
+        return smallest_window_size + 1
+    
+    @staticmethod    
+    def get_window_size(query_terms_position, query_terms_posting_list):
+        values = [query_terms_posting_list[qt][query_terms_position[qt]] for qt in query_terms_posting_list]
+        return max(values) - min(values)
+    
+    @staticmethod    
+    def is_query_terms_position_valid(query_terms_position, query_terms_posting_list):
+        if len(query_terms_posting_list) == 0 or len(query_terms_position) == 0:
+            return False
+                
+        for qt in query_terms_posting_list:
+            if query_terms_position[qt] >= len(query_terms_posting_list[qt]):
+                return False
+        
+        return True
+    
+    @staticmethod    
+    def update_query_terms_position(query_terms_position, query_terms_posting_list):
+        minvalue = min([query_terms_posting_list[qt][query_terms_position[qt]] for qt in query_terms_posting_list])
+        
+        for qt in query_terms_posting_list:
+            if query_terms_posting_list[qt][query_terms_position[qt]] == minvalue:
+                query_terms_position[qt] += 1
+                return query_terms_position
+            
+        return query_terms_position
 
 class DocUtils(object):
     '''Container class for utility static methods'''
@@ -227,15 +295,15 @@ class Page(object):
     '''Represents a single web page, with all its fields. Contains TF vectors for the fields'''
     def __init__(self,page,page_fields):
         self.url = page
-        
+         
         self.body_length = page_fields.get('body_length',1.0)
         self.body_length = max(1000.0,self.body_length) #(500.0 if self.body_length == 0 else self.body_length)
         
-        self.pagerank = page_fields.get('pagerank',0)
-        self.title = page_fields.get('title',"")
-        self.header = page_fields.get('header',"")
-        self.body_hits = page_fields.get('body_hits',{})
-        self.anchors = [Anchor(text,count) for text,count in page_fields.get('anchors',{}).iteritems()]
+        self.pagerank         = page_fields.get('pagerank',0)
+        self.title            = page_fields.get('title',"")
+        self.header           = page_fields.get('header',"")
+        self.body_hits        = page_fields.get('body_hits',{})
+        self.anchors          = [Anchor(text,count) for text,count in page_fields.get('anchors',{}).iteritems()]
         self.field_tf_vectors = self.compute_field_tf_vectors()
         
         # Combine field vectors
@@ -334,20 +402,70 @@ class QueryPage(object):
         'header':   1.0,
         'body'  :   1.0,
         'anchor':   1.0,
-        'title' :   1.0     
+        'title' :   1.0,
     }
+    
+    smallest_window_boost = 2.0
         
-    def __init__(self,query,page):
+    def __init__(self,query,page,useSmallestWindow=False):
         self.query = query
         self.page = page
         self.field_scores = {}
         self.final_score = 0.0
-        self.compute_cosine_scores()
+        self.compute_cosine_scores(useSmallestWindow)
         
-    def compute_cosine_scores(self):
-        #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
-        self.final_score = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
-    
+    def compute_cosine_scores(self, useSmallestWindow=False):
+        if useSmallestWindow:
+            INFINITE  = sys.maxsize
+            QUERY_LEN = len(self.query.terms) 
+            B         = 1.0
+            
+            smallestWindow = self.findSmallestWindow(self.query, self.page)
+            
+            if smallestWindow == QUERY_LEN:
+                B = self.smallest_window_boost
+            elif smallestWindow == INFINITE:
+                B = 1.0
+            elif smallestWindow > QUERY_LEN:
+                B_scaled = self.smallest_window_boost * (float(QUERY_LEN) / smallestWindow)
+                B = 1.0 if B_scaled < 1.0 else B_scaled
+                
+            self.final_score = B * DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
+            
+        else:
+            #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
+            self.final_score = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
+            
+    def findSmallestWindow(self, query, page):        
+        url_terms     = filter(lambda x: len(x) > 0, re.split('\W', page.url))
+        title_terms   = page.title.lower().strip().split()
+        header_terms  = reduce(lambda x,h: x+h.strip().lower().split(),page.header,[])
+        anchors_terms = dict([(anchor.text,anchor.terms) for anchor in page.anchors])
+        body_terms    = page.body_hits
+        
+        query_terms_postings_in_url     = SmallestWindowUtils.get_query_terms_postings_in_field(query.terms, url_terms)
+        query_terms_postings_in_title   = SmallestWindowUtils.get_query_terms_postings_in_field(query.terms, title_terms)
+        query_terms_postings_in_header  = SmallestWindowUtils.get_query_terms_postings_in_field(query.terms, header_terms)
+        query_terms_postings_in_body    = SmallestWindowUtils.get_query_terms_postings_in_field(query.terms, body_terms)
+
+        query_terms_postings_in_anchors = [] # There is an entry in the list for each anchor in the page
+        for anchor_terms in anchors_terms.values():
+            query_terms_postings_in_anchors.append(SmallestWindowUtils.get_query_terms_postings_in_field(query.terms, anchor_terms))
+            
+        window_sizes = []
+        window_sizes.append(SmallestWindowUtils.get_smallest_window_size(query_terms_postings_in_url))
+        window_sizes.append(SmallestWindowUtils.get_smallest_window_size(query_terms_postings_in_title))
+        window_sizes.append(SmallestWindowUtils.get_smallest_window_size(query_terms_postings_in_header))
+        window_sizes.append(SmallestWindowUtils.get_smallest_window_size(query_terms_postings_in_body))
+        
+        for query_terms_postings_in_anchor in query_terms_postings_in_anchors:
+            window_sizes.append(SmallestWindowUtils.get_smallest_window_size(query_terms_postings_in_anchor))
+        
+        smallest_window = min(window_sizes)
+        #print >> sys.stderr, "Query: " + str(query.terms) + " Page: " + page.url + " Smallest Window: " + str(smallest_window)
+        
+        return smallest_window
+
     
 class QueryPageBM25F(object):
     
@@ -374,10 +492,6 @@ class QueryPageBM25F(object):
             
     def compute_bm25f_scores(self):
         terms_raw_tf_per_field = [ self.page.compute_raw_tf_vector(term) for term in self.query.terms ]  # e.g. [ [1 3 4 1 3], [4 5 2 1 2] ]
-        #print >> sys.stderr, "Query: " + self.query.query
-        #print >> sys.stderr, "Query Terms: " + str(self.query.terms)
-        #print >> sys.stderr, "Page: " + self.page.url
-        #print >> sys.stderr, "query_terms_raw_tf_per_field: " + str(terms_raw_tf_per_field)
         
         # Field dependent normalized tf per term
         fdn_tf = []
@@ -428,8 +542,8 @@ class Query(object):
         self.tf_vector = DocUtils.logify(self.tf_vector)
         self.tf_vector = DocUtils.IDFy(self.tf_vector,corpus)
         
-    def compute_cosine_scores(self):
-        self.page_scores = [QueryPage(self,page) for p,page in self.pages.iteritems()]       
+    def compute_cosine_scores(self,useSmallestWindow=False):
+        self.page_scores = [QueryPage(self,page,useSmallestWindow) for p,page in self.pages.iteritems()]       
         self.ranked_page_scores = [(qp.page.url,qp.final_score) for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
         self.ranked_pages = [qp.page.url for qp in sorted(self.page_scores,key=lambda x: x.final_score, reverse=True)]
         return self.ranked_pages        
