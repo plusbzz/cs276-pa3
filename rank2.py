@@ -155,7 +155,7 @@ def main(featureFile):
             
         if i%100 == 0: print >> sys.stderr,"Number of trials: ",i,QueryPageBM25F.bm25f_B,QueryPageBM25F.bm25f_W,QueryPageBM25F.K1,QueryPageBM25F.lamd,QueryPageBM25F.lamd_prime,QueryPageBM25F.lamd_prime2
     
-    
+    print >> sys.stderr, "Final best:",best_score,best_B,best_W,best_K1,best_lamd,best_lamd_prime,best_lamd_prime2
         
 if __name__=='__main__':
     if (len(sys.argv) < 2):
