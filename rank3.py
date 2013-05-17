@@ -98,14 +98,16 @@ def main(featureFile):
     (queries, features) = extractFeatures(featureFile)
     
     QueryPage.cosine_w = {
-        'url'   :   -1705,
-        'header':   -85,
-        'body'  :   -97,
-        'anchor':   -17,
-        'title' :   -288
-    }
-    
-    QueryPage.smallest_window_boost = 6.0
+        'url'   :   -100,
+        'header':   -80,
+        'body'  :   -90,
+        'anchor':   -10,
+        'title' :   -90
+    }  
+
+    QueryPage.smallest_window['boost']    = 1024
+    #QueryPage.smallest_window['function'] = 'inverse'
+    QueryPage.smallest_window['function'] = 'sigmoid'    
   
     #calling baseline ranking system, replace with yours
     rankedQueries = cosineRankQueries_withSmallestWindow(features,corpus)

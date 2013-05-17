@@ -1,13 +1,26 @@
 from collections import Counter
 import os,sys
 from os import path
-from math import log
+from math import log,exp
 import re
 import types
 import cPickle as marshal
 
 class SmallestWindowUtils(object):
     '''Container class for SmallestWindow utility static methods'''
+    
+    @staticmethod
+    def inverseFunction(boost,queryLen,smallestWindowLen):
+        B_scaled = boost * (float(queryLen) / smallestWindowLen)
+        return 1.0 if B_scaled < 1.0 else B_scaled        
+        
+    @staticmethod
+    def sigmoidFunction(boost,queryLen,smallestWindowLen):
+        x = smallestWindowLen - queryLen
+        inverse_sigmoid = 1 - 1/(1+exp(-x)) # 1 + (1 - 1/(1+exp(-smallestWindowLen)))
+        B_scaled = boost * inverse_sigmoid
+        return 1.0 if B_scaled < 1.0 else B_scaled        
+
     
     @staticmethod
     def get_query_terms_postings_in_field(queryTerms, field):
@@ -405,7 +418,10 @@ class QueryPage(object):
         'title' :   1.0,
     }
     
-    smallest_window_boost = 2.0
+    smallest_window = {
+        'boost'   :    2.0,
+        'function':    'inverse' #exponential
+    }
         
     def __init__(self,query,page,useSmallestWindow=False):
         self.query = query
@@ -423,12 +439,14 @@ class QueryPage(object):
             smallestWindow = self.findSmallestWindow(self.query, self.page)
             
             if smallestWindow == QUERY_LEN:
-                B = self.smallest_window_boost
+                B = self.smallest_window['boost']
             elif smallestWindow == INFINITE:
                 B = 1.0
             elif smallestWindow > QUERY_LEN:
-                B_scaled = self.smallest_window_boost * (float(QUERY_LEN) / smallestWindow)
-                B = 1.0 if B_scaled < 1.0 else B_scaled
+                if self.smallest_window['function'] == 'inverse':
+                    B = SmallestWindowUtils.inverseFunction(self.smallest_window['boost'], QUERY_LEN, smallestWindow)
+                elif self.smallest_window['function'] == 'sigmoid':
+                    B = SmallestWindowUtils.sigmoidFunction(self.smallest_window['boost'], QUERY_LEN, smallestWindow)                    
              
             score         = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
             adjustedScore = B * score

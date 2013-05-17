@@ -110,6 +110,14 @@ def main(featureFile):
     #populate map with features from file
     (queries, features) = extractFeatures(featureFile)
     
+    # [url,title,header,body,anchor]
+    QueryPageBM25F.bm25f_B     = [1.0,0.1,1.0,1.0,0.1]
+    QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
+    QueryPageBM25F.bm25f_K1    = 1.5
+    QueryPageBM25F.lamd        = 1.0
+    QueryPageBM25F.lamd_prime  = 1.0
+    QueryPageBM25F.lamd_prime2 = 1.0
+    
     QueryPageBM25F.Vf = v_logarithmic
     fields_avg_len    = DocUtils.features_avg_len(features)
   
@@ -119,41 +127,43 @@ def main(featureFile):
     #print ranked results to file
     printRankedResults(rankedQueries,outputFileName)
     
-    # run experiments to determine best cosine weights
-    best_B           = QueryPageBM25F.bm25f_B
-    best_W           = QueryPageBM25F.bm25f_W
-    best_K1          = QueryPageBM25F.K1
-    best_lamd        = QueryPageBM25F.lamd
-    best_lamd_prime  = QueryPageBM25F.lamd_prime
-    best_lamd_prime2 = QueryPageBM25F.lamd_prime2
-    best_score       = 0.0
+    print >> sys.stderr, "Score: ", ndcg.scoreResults(outputFileName,'queryDocTrainRel')    
     
-    for i in xrange(1,10000):
-        # [url,title,header,body,anchor]
-        QueryPageBM25F.bm25f_B     = [uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0)]
-        QueryPageBM25F.bm25f_W     = [uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0)]
-        QueryPageBM25F.bm25f_K1    = uniform(1.2,2.0)
-        QueryPageBM25F.lamd        = uniform(0.0,0.1)
-        QueryPageBM25F.lamd_prime  = uniform(0.0,0.1)
-        QueryPageBM25F.lamd_prime2 = uniform(0.0,0.1)
-        
-        rankedQueries = bm25fRankQueries(features,fields_avg_len,corpus)
-        printRankedResults(rankedQueries,outputFileName)
-        score = ndcg.scoreResults(outputFileName,'queryDocTrainRel')
-        
-        if score > best_score:
-            best_score       = score
-            best_B           = QueryPageBM25F.bm25f_B
-            best_W           = QueryPageBM25F.bm25f_W
-            best_K1          = QueryPageBM25F.K1
-            best_lamd        = QueryPageBM25F.lamd
-            best_lamd_prime  = QueryPageBM25F.lamd_prime
-            best_lamd_prime2 = QueryPageBM25F.lamd_prime2
-            print >> sys.stderr, "New best:",best_score,best_B,best_W,best_K1,best_lamd,best_lamd_prime,best_lamd_prime2
-            
-        if i%100 == 0: print >> sys.stderr,"Number of trials: ",i,QueryPageBM25F.bm25f_B,QueryPageBM25F.bm25f_W,QueryPageBM25F.K1,QueryPageBM25F.lamd,QueryPageBM25F.lamd_prime,QueryPageBM25F.lamd_prime2
-    
-    print >> sys.stderr, "Final best:",best_score,best_B,best_W,best_K1,best_lamd,best_lamd_prime,best_lamd_prime2
+    ## run experiments to determine best cosine weights
+    #best_B           = QueryPageBM25F.bm25f_B
+    #best_W           = QueryPageBM25F.bm25f_W
+    #best_K1          = QueryPageBM25F.K1
+    #best_lamd        = QueryPageBM25F.lamd
+    #best_lamd_prime  = QueryPageBM25F.lamd_prime
+    #best_lamd_prime2 = QueryPageBM25F.lamd_prime2
+    #best_score       = 0.0
+    #
+    #for i in xrange(1,10000):
+    #    # [url,title,header,body,anchor]
+    #    QueryPageBM25F.bm25f_B     = [uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0)]
+    #    QueryPageBM25F.bm25f_W     = [uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0)]
+    #    QueryPageBM25F.bm25f_K1    = uniform(1.2,2.0)
+    #    QueryPageBM25F.lamd        = uniform(0.0,0.1)
+    #    QueryPageBM25F.lamd_prime  = uniform(0.0,0.1)
+    #    QueryPageBM25F.lamd_prime2 = uniform(0.0,0.1)
+    #    
+    #    rankedQueries = bm25fRankQueries(features,fields_avg_len,corpus)
+    #    printRankedResults(rankedQueries,outputFileName)
+    #    score = ndcg.scoreResults(outputFileName,'queryDocTrainRel')
+    #    
+    #    if score > best_score:
+    #        best_score       = score
+    #        best_B           = QueryPageBM25F.bm25f_B
+    #        best_W           = QueryPageBM25F.bm25f_W
+    #        best_K1          = QueryPageBM25F.K1
+    #        best_lamd        = QueryPageBM25F.lamd
+    #        best_lamd_prime  = QueryPageBM25F.lamd_prime
+    #        best_lamd_prime2 = QueryPageBM25F.lamd_prime2
+    #        print >> sys.stderr, "New best:",best_score,best_B,best_W,best_K1,best_lamd,best_lamd_prime,best_lamd_prime2
+    #        
+    #    if i%100 == 0: print >> sys.stderr,"Number of trials: ",i,QueryPageBM25F.bm25f_B,QueryPageBM25F.bm25f_W,QueryPageBM25F.K1,QueryPageBM25F.lamd,QueryPageBM25F.lamd_prime,QueryPageBM25F.lamd_prime2
+    #
+    #print >> sys.stderr, "Final best:",best_score,best_B,best_W,best_K1,best_lamd,best_lamd_prime,best_lamd_prime2
         
 if __name__=='__main__':
     if (len(sys.argv) < 2):

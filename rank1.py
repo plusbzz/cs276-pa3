@@ -97,12 +97,12 @@ def main(featureFile):
     (queries, features) = extractFeatures(featureFile)
     
     QueryPage.cosine_w = {
-        'url'   :   -1705,
-        'header':   -85,
-        'body'  :   -97,
-        'anchor':   -17,
-        'title' :   -288
-    }    
+        'url'   :   -100,
+        'header':   -80,
+        'body'  :   -90,
+        'anchor':   -10,
+        'title' :   -90
+    }  
   
     #calling baseline ranking system, replace with yours
     rankedQueries = cosineRankQueries(features,corpus)
