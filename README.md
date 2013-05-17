@@ -5,6 +5,38 @@ Copy the data/ folder over from PA1 to this directory before running anything
 
 New best: 0.868612756726 {'url': -1705, 'header': -85, 'body': -97, 'anchor': -17, 'title': -288}
 
+
+
+Data for the report 
+==================================
+Q) For a function that includes the smallest window as one component, how does varying B and the boost function change the performance of the algorithm
+
+For Inverse Function varying the B value allowed us to get a max improvement of 0.52%. The improvement we observed ranged from +0.06% for B=1024 to +0.52%
+for B=16. After reaching B=16 we didn't get any better NDCG value by increasing B. This may be to the fact that documents where getting a high boost based on fields that were not
+very relevant.
+
+For Sigmoid Function varying the B value allowed us to get a max improvement of 0.23%. The improvement we observed ranged from +0.07% for B=2 to B=0.23% for B=16. After reaching B=16 we didn't get any better NDCG value by increasing B. This may be to the fact that documents where getting a high boost based on fields that were not
+very relevant.
+
+url    = 100,
+title  = 90,
+body   = 90,
+header = 80,
+anchor = 10
+
+NDCG (ranking_cosine) = 0.8343
+
+
+B = (2,4,8,16,32,64,128,256,512,1024)
+
+With Inverse Function
+NDCG (ranking_cosine_smallest_window per B) = (0.8376,0.8380,0.8374,0.8387,0.8372,0.8363,0.8354,0.8349,0.8349,0.8348)
+
+With Sigmoid Function
+NDCG (ranking_cosine_smallest_window per B) = (0.8349,0.8329,0.8350,0.8363,0.8359,0.8356,0.8351,0.8357,0.8355,0.8355)
+==================================
+
+
 ## Instructions from Staff
 This folder contains the following files:
 
