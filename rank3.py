@@ -105,7 +105,7 @@ def main(featureFile):
         'title' :   -90
     }  
 
-    QueryPage.smallest_window['boost']    = 1024
+    QueryPage.smallest_window['boost']    = 16
     #QueryPage.smallest_window['function'] = 'inverse'
     QueryPage.smallest_window['function'] = 'sigmoid'    
   

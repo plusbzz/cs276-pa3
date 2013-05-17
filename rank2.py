@@ -111,14 +111,16 @@ def main(featureFile):
     (queries, features) = extractFeatures(featureFile)
     
     # [url,title,header,body,anchor]
-    QueryPageBM25F.bm25f_B     = [1.0,0.1,1.0,1.0,0.1]
+    QueryPageBM25F.bm25f_B     = [1.0,1.0,0.5,0.5,0.1]
     QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
-    QueryPageBM25F.bm25f_K1    = 1.5
-    QueryPageBM25F.lamd        = 1.0
-    QueryPageBM25F.lamd_prime  = 1.0
+    QueryPageBM25F.K1          = 1.0
+    QueryPageBM25F.lamd        = 25.0
+    QueryPageBM25F.lamd_prime  = 20.0   
     QueryPageBM25F.lamd_prime2 = 1.0
     
-    QueryPageBM25F.Vf = v_logarithmic
+    #QueryPageBM25F.Vf = v_logarithmic
+    #QueryPageBM25F.Vf = v_sigmoid
+    QueryPageBM25F.Vf = v_saturation
     fields_avg_len    = DocUtils.features_avg_len(features)
   
     #calling baseline ranking system, replace with yours

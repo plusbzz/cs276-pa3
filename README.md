@@ -34,6 +34,49 @@ NDCG (ranking_cosine_smallest_window per B) = (0.8376,0.8380,0.8374,0.8387,0.837
 
 With Sigmoid Function
 NDCG (ranking_cosine_smallest_window per B) = (0.8349,0.8329,0.8350,0.8363,0.8359,0.8356,0.8351,0.8357,0.8355,0.8355)
+
+
+Q) BM25F, how Bs lambdas and K1 parameters affect the ranking functions
+
+Logarithmic:
+
+    # [url,title,header,body,anchor]
+    QueryPageBM25F.bm25f_B     = [1.0,1.0,1.0,1.0,1.0]
+    QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.1]
+    QueryPageBM25F.K1    = 1.5
+    QueryPageBM25F.lamd        = 1.0
+    QueryPageBM25F.lamd_prime  = 1.0
+    QueryPageBM25F.lamd_prime2 = 1.0
+    NDCG = 0.8413
+
+    # [url,title,header,body,anchor]
+    QueryPageBM25F.bm25f_B     = [1.0,0.1,1.0,1.0,0.1]
+    QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
+    QueryPageBM25F.K1    = 1
+    QueryPageBM25F.lamd        = 3.0
+    QueryPageBM25F.lamd_prime  = 2.0
+    QueryPageBM25F.lamd_prime2 = 1.0
+    NDCG = 0.8562
+    
+sigmoid:
+
+    # [url,title,header,body,anchor]
+    QueryPageBM25F.bm25f_B     = [1.0,0.5,0.5,0.5,0.1]
+    QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
+    QueryPageBM25F.K1    = 1.2
+    QueryPageBM25F.lamd        = 25.0
+    QueryPageBM25F.lamd_prime  = 1.0   
+    QueryPageBM25F.lamd_prime2 = 0.5
+    NDCG = 0.8542
+    
+saturation:
+    QueryPageBM25F.bm25f_B     = [1.0,1.0,0.5,0.5,0.1]
+    QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
+    QueryPageBM25F.K1    = 1.2
+    QueryPageBM25F.lamd        = 25.0
+    QueryPageBM25F.lamd_prime  = 20.0   
+    QueryPageBM25F.lamd_prime2 = 1.0
+    NDCG = 0.8564
 ==================================
 
 

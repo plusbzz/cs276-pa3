@@ -501,7 +501,6 @@ class QueryPageBM25F(object):
     lamd_prime  = 1.0
     lamd_prime2 = 1.0
     
-        
     def __init__(self,query,page,fields_avg_len,corpus):
         self.query = query
         self.page = page
@@ -546,9 +545,11 @@ class QueryPageBM25F(object):
         final_score = 0
         for idx in xrange(len(terms)):
             final_score += (weight_tf[idx] * corpus.get_IDF(terms[idx])) / (K1 + weight_tf[idx])
-         
-        # Non-textual feature (pagerank)   
+        
+        # Non-textual feature (pagerank)
         final_score += lamd * Vf(self, lamd_prime, pagerank, lamd_prime2)
+        
+        #print >> sys.stderr, "final_score_after: ", str(final_score)
         
         return final_score
         
