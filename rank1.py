@@ -1,6 +1,9 @@
 import sys
 import re
 from math import log
+from doc_utils import *
+from random import randint
+import ndcg
 
 #inparams
 #  featureFile: input file containing queries and url features
@@ -69,27 +72,57 @@ def baseline(queries, features):
 #inparams
 #  queries: contains ranked list of results for each query
 #  outputFile: output file name
-def printRankedResults(queries):
-    for query in queries:
-      print("query: " + query)
-      for res in queries[query]:
-        print("  url: " + res)
+def printRankedResults(queries,outFileName):
+    with open(outFileName,"wb") as outfile:
+        for query in queries:
+            print >> outfile, ("query: " + query)
+            for res in queries[query]:
+                print >> outfile, ("  url: " + res)
 
+
+def cosineRankQueries(features,corpus = None):
+    return dict([(query,Query(query,features[query],corpus).compute_cosine_scores()) for query in features])
+    
 #inparams
 #  featureFile: file containing query and url features
 def main(featureFile):
     #output file name
-    outputFile = "ranked.txt" #Please don't change this!
+    outputFileName = "ranked.txt" #Please don't change this!
 
+    print >> sys.stderr, "Analyzing corpus for IDF info"
+    corpus = CorpusInfo("data")
+    corpus.load_doc_freqs()
+    
     #populate map with features from file
     (queries, features) = extractFeatures(featureFile)
-
+  
     #calling baseline ranking system, replace with yours
-    rankedQueries = baseline(queries, features)
+    rankedQueries = cosineRankQueries(features,corpus)
     
     #print ranked results to file
-    printRankedResults(rankedQueries)
-       
+    printRankedResults(rankedQueries,outputFileName)
+    
+    # run experiments to determine best cosine weights
+    #best_weights = QueryPage.cosine_w
+    #best_score = 0.0
+    #
+    #for i in xrange(1,10000):
+    #    QueryPage.cosine_w = {
+    #        'url'   :   randint(-2500,500),
+    #        'header':   randint(-100,0),
+    #        'body'  :   randint(-500,0),
+    #        'anchor':   randint(-50,500),
+    #        'title' :   randint(-500,0)    
+    #    }
+    #    rankedQueries = cosineRankQueries(features,corpus)
+    #    printRankedResults(rankedQueries,outputFileName)
+    #    score = ndcg.scoreResults(outputFileName,'queryDocTrainRel')        
+    #    if score > best_score:
+    #        best_score = score
+    #        best_weights = QueryPage.cosine_w
+    #        print >> sys.stderr, "New best:",best_score,best_weights
+    #    if i%100 == 0: print >> sys.stderr,"Number of trials:",i,QueryPage.cosine_w
+        
 if __name__=='__main__':
     if (len(sys.argv) < 2):
       print "Insufficient number of arguments" 

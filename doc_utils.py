@@ -429,8 +429,12 @@ class QueryPage(object):
             elif smallestWindow > QUERY_LEN:
                 B_scaled = self.smallest_window_boost * (float(QUERY_LEN) / smallestWindow)
                 B = 1.0 if B_scaled < 1.0 else B_scaled
-                
-            self.final_score = B * DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
+             
+            score         = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
+            adjustedScore = B * score
+            
+            #print >> sys.stderr, "Query: " + str(self.query.terms) + " Page: " + self.page.url + " Smallest Window: " + str(smallestWindow) + " B: " + str(B) + " score: " + str(score) + " adjustedScore: " + str(adjustedScore)   
+            self.final_score = B * score
             
         else:
             #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
