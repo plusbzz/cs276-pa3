@@ -95,12 +95,24 @@ def main(featureFile):
     
     #populate map with features from file
     (queries, features) = extractFeatures(featureFile)
+    
+    QueryPage.cosine_w = {
+        'url'   :   -1705,
+        'header':   -85,
+        'body'  :   -97,
+        'anchor':   -17,
+        'title' :   -288
+    }    
   
     #calling baseline ranking system, replace with yours
     rankedQueries = cosineRankQueries(features,corpus)
     
     #print ranked results to file
     printRankedResults(rankedQueries,outputFileName)
+    
+    print >> sys.stderr, "Score: ", ndcg.scoreResults(outputFileName,'queryDocTrainRel')
+    #print >> sys.stderr, "Score: ", ndcg.scoreResults(outputFileName,'queryDocTrainRelDev')
+
     
     # run experiments to determine best cosine weights
     #best_weights = QueryPage.cosine_w

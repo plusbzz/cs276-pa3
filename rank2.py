@@ -128,13 +128,11 @@ def main(featureFile):
     best_lamd_prime2 = QueryPageBM25F.lamd_prime2
     best_score       = 0.0
     
-    
-    
     for i in xrange(1,10000):
         # [url,title,header,body,anchor]
         QueryPageBM25F.bm25f_B     = [uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0)]
         QueryPageBM25F.bm25f_W     = [uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0),uniform(0.0,1.0)]
-        QueryPageBM25F.bm25f_K1    = uniform(0.0,0.1)
+        QueryPageBM25F.bm25f_K1    = uniform(1.2,2.0)
         QueryPageBM25F.lamd        = uniform(0.0,0.1)
         QueryPageBM25F.lamd_prime  = uniform(0.0,0.1)
         QueryPageBM25F.lamd_prime2 = uniform(0.0,0.1)
