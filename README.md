@@ -16,7 +16,7 @@ Data for the report
 TASK2 - BM25F
 -------------
 function = Logarithmic
-Sigmoid gave us a slightly better NDCG i.e. 0.8564 vs 0.8562 (can we mention NDCG values in the report? Is it an honor code violation?)
+Sigmoid gave us a slightly better NDCG i.e. 0.8564 vs 0.8562 (can we mention NDCG values in the report?)
 However we chose Logarithmic because we think it maybe more stable across test sets (feel free to change this justification) )
 
 # [url,title,header,body,anchor]
