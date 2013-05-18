@@ -75,8 +75,10 @@ def baseline(queries, features):
 def printRankedResults(queries,outFileName):
     with open(outFileName,"wb") as outfile:
         for query in queries:
+            print("query: " + query)
             print >> outfile, ("query: " + query)
             for res in queries[query]:
+                print("  url: " + res)                
                 print >> outfile, ("  url: " + res)
 
 
@@ -110,31 +112,6 @@ def main(featureFile):
     #print ranked results to file
     printRankedResults(rankedQueries,outputFileName)
     
-    print >> sys.stderr, "Score: ", ndcg.scoreResults(outputFileName,'queryDocTrainRel')
-    #print >> sys.stderr, "Score: ", ndcg.scoreResults(outputFileName,'queryDocTrainRelDev')
-
-    
-    # run experiments to determine best cosine weights
-    #best_weights = QueryPage.cosine_w
-    #best_score = 0.0
-    #
-    #for i in xrange(1,10000):
-    #    QueryPage.cosine_w = {
-    #        'url'   :   randint(-2500,500),
-    #        'header':   randint(-100,0),
-    #        'body'  :   randint(-500,0),
-    #        'anchor':   randint(-50,500),
-    #        'title' :   randint(-500,0)    
-    #    }
-    #    rankedQueries = cosineRankQueries(features,corpus)
-    #    printRankedResults(rankedQueries,outputFileName)
-    #    score = ndcg.scoreResults(outputFileName,'queryDocTrainRel')        
-    #    if score > best_score:
-    #        best_score = score
-    #        best_weights = QueryPage.cosine_w
-    #        print >> sys.stderr, "New best:",best_score,best_weights
-    #    if i%100 == 0: print >> sys.stderr,"Number of trials:",i,QueryPage.cosine_w
-        
 if __name__=='__main__':
     if (len(sys.argv) < 2):
       print "Insufficient number of arguments" 

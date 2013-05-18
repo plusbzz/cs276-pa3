@@ -9,6 +9,35 @@ New best: 0.868612756726 {'url': -1705, 'header': -85, 'body': -97, 'anchor': -1
 
 Data for the report 
 ==================================
+
+* Summary
+
+-------------
+TASK2 - BM25F
+-------------
+function = Logarithmic
+Sigmoid gave us a slightly better NDCG i.e. 0.8564 vs 0.8562 (can we mention NDCG values in the report? Is it an honor code violation?)
+However we chose Logarithmic because we think it maybe more stable across test sets (feel free to change this justification) )
+
+# [url,title,header,body,anchor]
+QueryPageBM25F.bm25f_B     = [1.0,0.1,1.0,1.0,0.1]
+QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
+QueryPageBM25F.K1          = 1
+QueryPageBM25F.lamd        = 3.0
+QueryPageBM25F.lamd_prime  = 2.0
+QueryPageBM25F.lamd_prime2 = 1.0
+
+----------------------------
+FOR TASK3 - SMALLEST WINDOW
+----------------------------
+function = Inverse
+B        = 16
+
+
+    
+* Details
+
+
 Q) For a function that includes the smallest window as one component, how does varying B and the boost function change the performance of the algorithm
 
 For Inverse Function varying the B value allowed us to get a max improvement of 0.52%. The improvement we observed ranged from +0.06% for B=1024 to +0.52%
@@ -18,14 +47,13 @@ very relevant.
 For Sigmoid Function varying the B value allowed us to get a max improvement of 0.23%. The improvement we observed ranged from +0.07% for B=2 to B=0.23% for B=16. After reaching B=16 we didn't get any better NDCG value by increasing B. This may be to the fact that documents where getting a high boost based on fields that were not
 very relevant.
 
-url    = 100,
-title  = 90,
-body   = 90,
-header = 80,
-anchor = 10
+url    = -100,
+title  = -90,
+body   = -90,
+header = -80,
+anchor = -10
 
 NDCG (ranking_cosine) = 0.8343
-
 
 B = (2,4,8,16,32,64,128,256,512,1024)
 
@@ -39,15 +67,6 @@ NDCG (ranking_cosine_smallest_window per B) = (0.8349,0.8329,0.8350,0.8363,0.835
 Q) BM25F, how Bs lambdas and K1 parameters affect the ranking functions
 
 Logarithmic:
-
-    # [url,title,header,body,anchor]
-    QueryPageBM25F.bm25f_B     = [1.0,1.0,1.0,1.0,1.0]
-    QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.1]
-    QueryPageBM25F.K1    = 1.5
-    QueryPageBM25F.lamd        = 1.0
-    QueryPageBM25F.lamd_prime  = 1.0
-    QueryPageBM25F.lamd_prime2 = 1.0
-    NDCG = 0.8413
 
     # [url,title,header,body,anchor]
     QueryPageBM25F.bm25f_B     = [1.0,0.1,1.0,1.0,0.1]
@@ -72,7 +91,7 @@ sigmoid:
 saturation:
     QueryPageBM25F.bm25f_B     = [1.0,1.0,0.5,0.5,0.1]
     QueryPageBM25F.bm25f_W     = [1.0,0.9,0.8,0.9,0.7]
-    QueryPageBM25F.K1    = 1.2
+    QueryPageBM25F.K1          = 1
     QueryPageBM25F.lamd        = 25.0
     QueryPageBM25F.lamd_prime  = 20.0   
     QueryPageBM25F.lamd_prime2 = 1.0

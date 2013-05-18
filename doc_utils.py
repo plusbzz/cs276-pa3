@@ -451,11 +451,9 @@ class QueryPage(object):
             score         = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
             adjustedScore = B * score
             
-            #print >> sys.stderr, "Query: " + str(self.query.terms) + " Page: " + self.page.url + " Smallest Window: " + str(smallestWindow) + " B: " + str(B) + " score: " + str(score) + " adjustedScore: " + str(adjustedScore)   
             self.final_score = B * score
             
         else:
-            #print >> sys.stderr, self.page.url,self.query.tf_vector,self.page.tf_vector,QueryPage.field_weights       
             self.final_score = DocUtils.cosine_sim(self.query.tf_vector,self.page.tf_vector)
             
     def findSmallestWindow(self, query, page):        
@@ -484,7 +482,6 @@ class QueryPage(object):
             window_sizes.append(SmallestWindowUtils.get_smallest_window_size(query_terms_postings_in_anchor))
         
         smallest_window = min(window_sizes)
-        #print >> sys.stderr, "Query: " + str(query.terms) + " Page: " + page.url + " Smallest Window: " + str(smallest_window)
         
         return smallest_window
 
@@ -548,8 +545,6 @@ class QueryPageBM25F(object):
         
         # Non-textual feature (pagerank)
         final_score += lamd * Vf(self, lamd_prime, pagerank, lamd_prime2)
-        
-        #print >> sys.stderr, "final_score_after: ", str(final_score)
         
         return final_score
         
